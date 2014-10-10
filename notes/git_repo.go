@@ -3,6 +3,8 @@ package notes
 import (
 	"io/ioutil"
 	"log"
+	"os"
+	"path"
 	"time"
 
 	git "github.com/libgit2/git2go"
@@ -83,16 +85,20 @@ func (r *gitRepo) commit(treeID *git.Oid, message string) error {
 	return nil
 }
 
-func (r *gitRepo) makePath(path string) string {
+func (r *gitRepo) absolutePath(path string) string {
 	return r.path + path
 }
 
 func (r *gitRepo) ReadFile(path string) ([]byte, error) {
-	return ioutil.ReadFile(r.makePath(path))
+	return ioutil.ReadFile(r.absolutePath(path))
 }
 
-func (r *gitRepo) StoreFile(path string, data []byte) error {
-	err := ioutil.WriteFile(r.makePath(path), data, 0644)
+func (r *gitRepo) StoreFile(p string, data []byte) error {
+	if err := os.MkdirAll(path.Dir(r.absolutePath(p)), 0755); err != nil {
+		return err
+	}
+
+	err := ioutil.WriteFile(r.absolutePath(p), data, 0644)
 	if err != nil {
 		return err
 	}
@@ -103,7 +109,7 @@ func (r *gitRepo) StoreFile(path string, data []byte) error {
 	}
 	defer index.Free()
 
-	if err := index.AddByPath(path); err != nil {
+	if err := index.AddByPath(p); err != nil {
 		return err
 	}
 
@@ -112,5 +118,5 @@ func (r *gitRepo) StoreFile(path string, data []byte) error {
 		return err
 	}
 
-	return r.commit(treeID, path)
+	return r.commit(treeID, p)
 }

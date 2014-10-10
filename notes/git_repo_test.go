@@ -43,9 +43,9 @@ var _ = Describe("Repo", func() {
 			repo, err := NewGitRepo(tempDir)
 			Expect(err).To(BeNil())
 			Expect(repo).ToNot(BeNil())
-			err = repo.StoreFile("/Home.md", d)
+			err = repo.StoreFile("/foo/Home.md", d)
 			Expect(err).To(BeNil())
-			data, err := repo.ReadFile("/Home.md")
+			data, err := repo.ReadFile("/foo/Home.md")
 			Expect(err).To(BeNil())
 			Expect(data).To(Equal(d))
 

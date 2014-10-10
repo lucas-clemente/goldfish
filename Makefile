@@ -1,9 +1,18 @@
+.PHONY: all deps debug web bindata build
+
 all: build
 
 deps:
 	go get -t
 
-build:
-	GOOS=darwin go build -o build/notes_darwin
-	GOOS=windows go build -o build/notes.exe
-	GOOS=linux go build -o build/notes_linux
+debug:
+	go-bindata -prefix=web/dist -debug=true web/dist
+
+web:
+	cd web && ember build --production
+
+bindata: web
+	go-bindata -prefix=web/dist web/dist
+
+build: bindata
+	go build -o build/notes
