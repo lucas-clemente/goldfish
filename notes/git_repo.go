@@ -1,7 +1,7 @@
 package notes
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"path"
@@ -89,17 +89,22 @@ func (r *gitRepo) absolutePath(path string) string {
 	return r.path + path
 }
 
-func (r *gitRepo) ReadFile(path string) ([]byte, error) {
-	return ioutil.ReadFile(r.absolutePath(path))
+func (r *gitRepo) ReadFile(path string) (io.ReadCloser, error) {
+	return os.Open(r.absolutePath(path))
 }
 
-func (r *gitRepo) StoreFile(p string, data []byte) error {
+func (r *gitRepo) StoreFile(p string, data io.Reader) error {
 	if err := os.MkdirAll(path.Dir(r.absolutePath(p)), 0755); err != nil {
 		return err
 	}
 
-	err := ioutil.WriteFile(r.absolutePath(p), data, 0644)
+	file, err := os.OpenFile(r.absolutePath(p), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)
 	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	if _, err := io.Copy(file, data); err != nil {
 		return err
 	}
 

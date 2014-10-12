@@ -15,7 +15,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_ = repo
+
+	http.Handle("/v1", notes.NewHandler(repo, "/v1"))
 
 	http.Handle("/", http.FileServer(&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir}))
 	log.Fatal(http.ListenAndServe("localhost:3456", nil))

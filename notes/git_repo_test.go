@@ -1,10 +1,12 @@
 package notes_test
 
 import (
+	"bytes"
 	"io/ioutil"
 	"os"
 	"os/exec"
-	. "github.com/lucas-clemente/notes/notes"
+
+	"github.com/lucas-clemente/notes/notes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -27,7 +29,7 @@ var _ = Describe("Repo", func() {
 		})
 
 		It("inits new repos", func() {
-			repo, err := NewGitRepo(tempDir)
+			repo, err := notes.NewGitRepo(tempDir)
 			Expect(err).To(BeNil())
 			Expect(repo).ToNot(BeNil())
 
@@ -39,15 +41,17 @@ var _ = Describe("Repo", func() {
 		})
 
 		It("saves and reads files", func() {
-			d := []byte("# Home\n")
-			repo, err := NewGitRepo(tempDir)
+			repo, err := notes.NewGitRepo(tempDir)
 			Expect(err).To(BeNil())
 			Expect(repo).ToNot(BeNil())
-			err = repo.StoreFile("/foo/Home.md", d)
+			err = repo.StoreFile("/foo/Home.md", bytes.NewBufferString("foobar"))
 			Expect(err).To(BeNil())
-			data, err := repo.ReadFile("/foo/Home.md")
+			reader, err := repo.ReadFile("/foo/Home.md")
 			Expect(err).To(BeNil())
-			Expect(data).To(Equal(d))
+			defer reader.Close()
+			data, err := ioutil.ReadAll(reader)
+			Expect(err).To(BeNil())
+			Expect(data).To(Equal([]byte("foobar")))
 
 			cmd := exec.Command("git", "log")
 			cmd.Dir = tempDir
