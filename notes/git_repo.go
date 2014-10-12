@@ -90,7 +90,11 @@ func (r *gitRepo) absolutePath(path string) string {
 }
 
 func (r *gitRepo) ReadFile(path string) (io.ReadCloser, error) {
-	return os.Open(r.absolutePath(path))
+	f, err := os.Open(r.absolutePath(path))
+	if os.IsNotExist(err) {
+		return nil, NotFoundError{}
+	}
+	return f, err
 }
 
 func (r *gitRepo) StoreFile(p string, data io.Reader) error {

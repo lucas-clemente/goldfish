@@ -16,12 +16,16 @@ var _ = Describe("Repo", func() {
 	Context("git repos", func() {
 		var (
 			tempDir string
+			repo    notes.Repo
 		)
 
 		BeforeEach(func() {
 			var err error
 			tempDir, err = ioutil.TempDir("", "io.clemente.notes.test")
 			Expect(err).To(BeNil())
+			repo, err = notes.NewGitRepo(tempDir)
+			Expect(err).To(BeNil())
+			Expect(repo).ToNot(BeNil())
 		})
 
 		AfterEach(func() {
@@ -29,10 +33,6 @@ var _ = Describe("Repo", func() {
 		})
 
 		It("inits new repos", func() {
-			repo, err := notes.NewGitRepo(tempDir)
-			Expect(err).To(BeNil())
-			Expect(repo).ToNot(BeNil())
-
 			cmd := exec.Command("git", "log")
 			cmd.Dir = tempDir
 			out, err := cmd.Output()
@@ -41,10 +41,7 @@ var _ = Describe("Repo", func() {
 		})
 
 		It("saves and reads files", func() {
-			repo, err := notes.NewGitRepo(tempDir)
-			Expect(err).To(BeNil())
-			Expect(repo).ToNot(BeNil())
-			err = repo.StoreFile("/foo/Home.md", bytes.NewBufferString("foobar"))
+			err := repo.StoreFile("/foo/Home.md", bytes.NewBufferString("foobar"))
 			Expect(err).To(BeNil())
 			reader, err := repo.ReadFile("/foo/Home.md")
 			Expect(err).To(BeNil())
@@ -58,6 +55,27 @@ var _ = Describe("Repo", func() {
 			out, err := cmd.Output()
 			Expect(err).To(BeNil())
 			Expect(string(out)).To(ContainSubstring("Home.md"))
+		})
+
+		It("updates and reads files", func() {
+			err := repo.StoreFile("/foo/Home.md", bytes.NewBufferString("foobar"))
+			Expect(err).To(BeNil())
+
+			err = repo.StoreFile("/foo/Home.md", bytes.NewBufferString("foobaz"))
+			Expect(err).To(BeNil())
+
+			reader, err := repo.ReadFile("/foo/Home.md")
+			Expect(err).To(BeNil())
+			defer reader.Close()
+			data, err := ioutil.ReadAll(reader)
+			Expect(err).To(BeNil())
+			Expect(data).To(Equal([]byte("foobaz")))
+		})
+
+		It("handles not found", func() {
+			reader, err := repo.ReadFile("/foo")
+			Expect(reader).To(BeNil())
+			Expect(err).To(MatchError(notes.NotFoundError{}))
 		})
 	})
 })
