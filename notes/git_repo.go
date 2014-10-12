@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"strings"
 	"time"
 
 	git "github.com/libgit2/git2go"
@@ -52,43 +53,6 @@ func NewGitRepo(path string) (Repo, error) {
 	return &gitRepo{path: path, repo: repo}, nil
 }
 
-func (r *gitRepo) headCommit() (*git.Commit, error) {
-	headRef, err := r.repo.Head()
-	defer headRef.Free()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	headID := headRef.Target()
-	return r.repo.LookupCommit(headID)
-}
-
-func (r *gitRepo) commit(treeID *git.Oid, message string) error {
-	tree, err := r.repo.LookupTree(treeID)
-	if err != nil {
-		return err
-	}
-	defer tree.Free()
-
-	headCommit, err := r.headCommit()
-	if err != nil {
-		return err
-	}
-	defer headCommit.Free()
-
-	sig := &git.Signature{Name: "system", Email: "notes@clemente.io", When: time.Now()}
-	_, err = r.repo.CreateCommit("refs/heads/master", sig, sig, message, tree, headCommit)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (r *gitRepo) absolutePath(path string) string {
-	return r.path + path
-}
-
 func (r *gitRepo) ReadFile(path string) (io.ReadCloser, error) {
 	f, err := os.Open(r.absolutePath(path))
 	if os.IsNotExist(err) {
@@ -128,4 +92,71 @@ func (r *gitRepo) StoreFile(p string, data io.Reader) error {
 	}
 
 	return r.commit(treeID, p)
+}
+
+func (r *gitRepo) ListFiles(prefix string) ([]string, error) {
+	commit, err := r.headCommit()
+	if err != nil {
+		return nil, err
+	}
+	defer commit.Free()
+
+	tree, err := commit.Tree()
+	if err != nil {
+		return nil, err
+	}
+	defer tree.Free()
+
+	files := []string{}
+
+	// TODO use prefix to chose initial tree
+	err = tree.Walk(func(path string, e *git.TreeEntry) int {
+		f := "/" + path + e.Name
+		if e.Type == git.ObjectBlob && strings.HasPrefix(f, prefix) {
+			files = append(files, f)
+		}
+		return 0
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return files, nil
+}
+
+func (r *gitRepo) headCommit() (*git.Commit, error) {
+	headRef, err := r.repo.Head()
+	defer headRef.Free()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	headID := headRef.Target()
+	return r.repo.LookupCommit(headID)
+}
+
+func (r *gitRepo) commit(treeID *git.Oid, message string) error {
+	tree, err := r.repo.LookupTree(treeID)
+	if err != nil {
+		return err
+	}
+	defer tree.Free()
+
+	headCommit, err := r.headCommit()
+	if err != nil {
+		return err
+	}
+	defer headCommit.Free()
+
+	sig := &git.Signature{Name: "system", Email: "notes@clemente.io", When: time.Now()}
+	_, err = r.repo.CreateCommit("refs/heads/master", sig, sig, message, tree, headCommit)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *gitRepo) absolutePath(path string) string {
+	return r.path + path
 }

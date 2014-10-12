@@ -72,6 +72,22 @@ var _ = Describe("Repo", func() {
 			Expect(data).To(Equal([]byte("foobaz")))
 		})
 
+		It("lists files", func() {
+			err := repo.StoreFile("/foo/bar", bytes.NewBufferString("foobar"))
+			Expect(err).To(BeNil())
+
+			err = repo.StoreFile("/baz", bytes.NewBufferString("foobaz"))
+			Expect(err).To(BeNil())
+
+			files, err := repo.ListFiles("/")
+			Expect(err).To(BeNil())
+			Expect(files).To(Equal([]string{"/baz", "/foo/bar"}))
+
+			files, err = repo.ListFiles("/foo")
+			Expect(err).To(BeNil())
+			Expect(files).To(Equal([]string{"/foo/bar"}))
+		})
+
 		It("handles not found", func() {
 			reader, err := repo.ReadFile("/foo")
 			Expect(reader).To(BeNil())

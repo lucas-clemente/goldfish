@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"sort"
+	"strings"
 
 	"github.com/lucas-clemente/notes/notes"
 
@@ -32,6 +34,17 @@ func (r *mockRepo) StoreFile(path string, reader io.Reader) error {
 	return nil
 }
 
+func (r *mockRepo) ListFiles(prefix string) ([]string, error) {
+	paths := []string{}
+	for p := range r.files {
+		if strings.HasPrefix(p, prefix) {
+			paths = append(paths, p)
+		}
+	}
+	sort.Strings(paths)
+	return paths, nil
+}
+
 var _ = Describe("Handler", func() {
 	var (
 		repo *mockRepo
@@ -41,6 +54,7 @@ var _ = Describe("Handler", func() {
 	BeforeEach(func() {
 		files := map[string]string{
 			"/foo/bar.md": "foobar",
+			"/baz":        "foobaz",
 		}
 		repo = &mockRepo{files: files}
 		resp = httptest.NewRecorder()
@@ -79,5 +93,23 @@ var _ = Describe("Handler", func() {
 		handler.ServeHTTP(resp, req)
 		Expect(resp.Code).To(Equal(http.StatusNoContent))
 		Expect(repo.files["/new"]).To(Equal("foobaz"))
+	})
+
+	It("GETs root", func() {
+		handler := notes.NewHandler(repo, "/v1")
+		req, err := http.NewRequest("GET", "/v1/", nil)
+		Expect(err).To(BeNil())
+		handler.ServeHTTP(resp, req)
+		Expect(resp.Code).To(Equal(http.StatusOK))
+		Expect(resp.Body.String()).To(MatchJSON(`["/baz", "/foo/bar.md"]`))
+	})
+
+	It("GETs subdir", func() {
+		handler := notes.NewHandler(repo, "/v1")
+		req, err := http.NewRequest("GET", "/v1/foo/", nil)
+		Expect(err).To(BeNil())
+		handler.ServeHTTP(resp, req)
+		Expect(resp.Code).To(Equal(http.StatusOK))
+		Expect(resp.Body.String()).To(MatchJSON(`["/foo/bar.md"]`))
 	})
 })

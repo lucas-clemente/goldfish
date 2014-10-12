@@ -1,6 +1,7 @@
 package notes
 
 import (
+	"encoding/json"
 	"io"
 	"log"
 	"net/http"
@@ -19,21 +20,37 @@ func NewHandler(repo Repo, prefix string) http.Handler {
 
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := strings.TrimPrefix(r.URL.Path, h.prefix)
+	if len(path) == 0 {
+		http.NotFound(w, r)
+		return
+	}
 
 	switch r.Method {
 	case "GET":
-		c, err := h.repo.ReadFile(path)
-		if err != nil {
-			if _, ok := err.(NotFoundError); ok {
-				http.NotFound(w, r)
-			} else {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+		if path[len(path)-1] == '/' {
+			files, err := h.repo.ListFiles(path)
+			if err != nil {
+				handleError(err, w)
+				return
 			}
-			return
-		}
-		defer c.Close()
-		if _, err := io.Copy(w, c); err != nil {
-			log.Println(err)
+
+			data, err := json.Marshal(files)
+			if err != nil {
+				handleError(err, w)
+				return
+			}
+
+			w.Write(data)
+		} else {
+			c, err := h.repo.ReadFile(path)
+			if err != nil {
+				handleError(err, w)
+				return
+			}
+			defer c.Close()
+			if _, err := io.Copy(w, c); err != nil {
+				log.Println(err)
+			}
 		}
 
 	case "POST":
@@ -47,5 +64,13 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	}
+}
+
+func handleError(err error, w http.ResponseWriter) {
+	if _, ok := err.(NotFoundError); ok {
+		http.NotFound(w, nil)
+	} else {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
