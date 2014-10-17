@@ -40,6 +40,8 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
+			w.Header().Set("Content-Type", "application/json")
+
 			w.Write(data)
 		} else {
 			c, err := h.repo.ReadFile(path)

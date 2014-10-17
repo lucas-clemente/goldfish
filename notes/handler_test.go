@@ -101,6 +101,7 @@ var _ = Describe("Handler", func() {
 		Expect(err).To(BeNil())
 		handler.ServeHTTP(resp, req)
 		Expect(resp.Code).To(Equal(http.StatusOK))
+		Expect(resp.Header().Get("Content-Type")).To(Equal("application/json"))
 		Expect(resp.Body.String()).To(MatchJSON(`["/baz", "/foo/bar.md"]`))
 	})
 
@@ -110,6 +111,7 @@ var _ = Describe("Handler", func() {
 		Expect(err).To(BeNil())
 		handler.ServeHTTP(resp, req)
 		Expect(resp.Code).To(Equal(http.StatusOK))
+		Expect(resp.Header().Get("Content-Type")).To(Equal("application/json"))
 		Expect(resp.Body.String()).To(MatchJSON(`["/foo/bar.md"]`))
 	})
 })
