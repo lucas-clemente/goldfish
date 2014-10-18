@@ -1,12 +1,18 @@
 var gulp   = require('gulp');
+var util   = require('gulp-util');
+var size = require('gulp-size');
 var concat = require('gulp-concat');
 var jshint = require('gulp-jshint');
 var sass = require('gulp-sass');
 var connect = require('gulp-connect');
 var watch = require('gulp-watch');
 var traceur = require('gulp-traceur');
+var uglify = require('gulp-uglify');
+var minifyCss = require('gulp-minify-css');
 
 var config = {
+  production: process.env.ENV === 'production',
+
   js: {
     src: [
       'js/models/*.js',
@@ -42,7 +48,7 @@ var config = {
   },
 
   fonts: {
-    src: 'bower_components/fontawesome/fonts/*',
+    src: 'bower_components/fontawesome/fonts/fontawesome-webfont.woff',
     dest: 'dist/assets/fonts'
   }
 };
@@ -56,6 +62,7 @@ gulp.task('js', function () {
       }
     }))
     .pipe(concat({path: 'app.js'}))
+    .pipe(config.production ? uglify() : util.noop())
     .pipe(gulp.dest(config.js.dest))
     .pipe(connect.reload());
 });
@@ -64,6 +71,7 @@ gulp.task('css', function () {
   return gulp.src(config.css.src)
     .pipe(concat({path: 'app.css'}))
     .pipe(sass())
+    .pipe(config.production ? minifyCss() : util.noop())
     .pipe(gulp.dest(config.css.dest))
     .pipe(connect.reload());
 });
@@ -93,6 +101,7 @@ gulp.task('fonts', function () {
 gulp.task('vendor-js', function () {
   return gulp.src(config.vendor_js.src)
     .pipe(concat({path: 'vendor.js'}))
+    .pipe(config.production ? uglify() : util.noop())
     .pipe(gulp.dest(config.vendor_js.dest));
 });
 
@@ -109,4 +118,9 @@ gulp.task('watch', ['server'], function () {
 });
 
 
-gulp.task('default', ['lint', 'js', 'css', 'html', 'vendor-js', 'imgs', 'fonts']);
+gulp.task('default', ['lint', 'js', 'css', 'html', 'vendor-js', 'imgs', 'fonts'], function () {
+  return gulp.src("dist/**")
+    .pipe(size({
+      showFiles: true
+    }));
+});
