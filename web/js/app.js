@@ -7,11 +7,20 @@ var PageList = Backbone.Collection.extend({
 });
 
 var App = Backbone.Router.extend({
+  initialize: function () {
+    this.bind('all', this.updateHighlights);
+  },
+
   routes: {
     "":              "folder",
     "*folder/":      "folder",
     "*folder/:page": "page",
     ":page":         "page",
+  },
+
+  updateHighlights: function (route) {
+    $('a[href="' + window.location.pathname + '"]').addClass("active");
+    $('a[href!="' + window.location.pathname + '"]').removeClass("active");
   },
 
   folder: function (folder) {
