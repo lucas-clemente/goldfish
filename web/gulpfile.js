@@ -26,6 +26,11 @@ var config = {
     dest: 'dist',
   },
 
+  imgs: {
+    src: 'logo.svg',
+    dest: 'dist/assets',
+  },
+
   vendor_js: {
     src: [
       'bower_components/jquery/dist/jquery.js',
@@ -69,6 +74,12 @@ gulp.task('html', function () {
     .pipe(connect.reload());
 });
 
+gulp.task('imgs', function () {
+  return gulp.src(config.imgs.src)
+    .pipe(gulp.dest(config.imgs.dest))
+    .pipe(connect.reload());
+});
+
 gulp.task('vendor-js', function () {
   return gulp.src(config.vendor_js.src)
     .pipe(concat({path: 'vendor.js'}))
@@ -84,6 +95,7 @@ gulp.task('server', function() {
 });
 
 gulp.task('watch', ['server'], function () {
+  gulp.watch([config.js.src, config.css.src, config.html.src], ['html', 'js', 'css', 'imgs']);
 });
 
 
