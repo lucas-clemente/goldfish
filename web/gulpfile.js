@@ -40,6 +40,11 @@ var config = {
     ],
     dest: 'dist/assets',
   },
+
+  fonts: {
+    src: 'bower_components/fontawesome/fonts/*',
+    dest: 'dist/assets/fonts'
+  }
 };
 
 gulp.task('js', function () {
@@ -77,8 +82,12 @@ gulp.task('html', function () {
 
 gulp.task('imgs', function () {
   return gulp.src(config.imgs.src)
-    .pipe(gulp.dest(config.imgs.dest))
-    .pipe(connect.reload());
+    .pipe(gulp.dest(config.imgs.dest));
+});
+
+gulp.task('fonts', function () {
+  return gulp.src(config.fonts.src)
+    .pipe(gulp.dest(config.fonts.dest));
 });
 
 gulp.task('vendor-js', function () {
@@ -96,8 +105,8 @@ gulp.task('server', function() {
 });
 
 gulp.task('watch', ['server'], function () {
-  gulp.watch([config.js.src, config.css.src, config.html.src], ['html', 'js', 'css', 'imgs']);
+  gulp.watch([config.js.src, config.css.src, config.html.src], ['html', 'js', 'css']);
 });
 
 
-gulp.task('default', ['lint', 'js', 'css', 'html', 'vendor-js']);
+gulp.task('default', ['lint', 'js', 'css', 'html', 'vendor-js', 'imgs', 'fonts']);

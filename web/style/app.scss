@@ -1,4 +1,7 @@
-@import 'bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap.scss';
+@import 'bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap';
+
+$fa-font-path: "/assets/fonts";
+@import 'bower_components/fontawesome/scss/font-awesome';
 
 #logo {
   height: 20px;
@@ -7,4 +10,10 @@
 
 .page-header {
   margin-top: 0;
+}
+
+.file-item {
+  i {
+    margin-right: 8px;
+  }
 }

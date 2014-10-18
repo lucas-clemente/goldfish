@@ -7,5 +7,9 @@ export default Backbone.Model.extend({
 
   markdownText: function () {
     return marked(this.attributes.text);
-  }
+  },
+
+  name: function () {
+    return this.id.slice(this.id.lastIndexOf('/') + 1);
+  },
 });

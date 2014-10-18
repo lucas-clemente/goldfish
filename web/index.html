@@ -43,9 +43,13 @@
 
 <script type="text/template" id="template-page">
   <div class="page-header">
-    <h1><%= id %></h1>
+    <h1><%= name() %></h1>
   </div>
   <%= markdownText() %>
+</script>
+
+<script type="text/template" id="template-page-item">
+  <i class="fa fa-file-text-o"></i> <%= name() %>
 </script>
 
 <script src="/assets/vendor.js"></script>
