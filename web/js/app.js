@@ -1,9 +1,4 @@
-var Page = Backbone.Model.extend({
-  defaults: {
-    html: "",
-    loaded: false,
-  }
-});
+import Page from 'page';
 
 var PageItemView = Backbone.View.extend({
   tagName: 'a',
@@ -11,7 +6,7 @@ var PageItemView = Backbone.View.extend({
 
   render: function () {
     this.$el.text(this.model.id);
-    this.$el.attr('href', this.model.id)
+    this.$el.attr('href', this.model.id);
     return this;
   },
 });
@@ -95,9 +90,9 @@ var AppView = Backbone.View.extend({
 
   fetchCollections: function () {
     var items = [
-      {id: "/foo", text: "item one" },
-      {id: "/bar", text: "item two" },
-      {id: "/baz", text: "item three" }
+      {id: "/foo", text: "item one"},
+      {id: "/bar", text: "item two"},
+      {id: "/baz", text: "item three"},
     ];
     this.pageList.reset(items);
   }

@@ -4,11 +4,14 @@ var jshint = require('gulp-jshint');
 var sass = require('gulp-sass');
 var connect = require('gulp-connect');
 var watch = require('gulp-watch');
-
+var traceur = require('gulp-traceur');
 
 var config = {
   js: {
-    src: 'js/*.js',
+    src: [
+      'js/models/*.js',
+      'js/app.js',
+    ],
     dest: 'dist/assets',
   },
 
@@ -34,6 +37,12 @@ var config = {
 
 gulp.task('js', function () {
   return gulp.src(config.js.src)
+    .pipe(traceur({
+      modules: 'inline',
+      moduleName: function (path) {
+        return path;
+      }
+    }))
     .pipe(concat({path: 'app.js'}))
     .pipe(gulp.dest(config.js.dest))
     .pipe(connect.reload());
