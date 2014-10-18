@@ -8,7 +8,7 @@ export default Backbone.View.extend({
   setModel: function (model) {
     this.model = model;
     if (!this.model.get("loaded")) {
-      this.model.set('html', this.template(this.model.attributes));
+      this.model.set('html', this.template(this.model));
       this.model.set("loaded", true);
       this.render();
     } else {

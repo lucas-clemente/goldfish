@@ -40,7 +40,7 @@ var AppView = Backbone.View.extend({
 
   fetchCollections: function () {
     var items = [
-      {id: "/foo", text: "item one"},
+      {id: "/foo", text: "Foobar _emph_\n\n __strong__\n\n- list 1\n- list 2"},
       {id: "/bar", text: "item two"},
       {id: "/baz", text: "item three"},
     ];

@@ -3,6 +3,7 @@
   "dependencies": {
     "bootstrap-sass-official": "~3.2.0+2",
     "underscore": "~1.7.0",
-    "backbone": "~1.1.2"
+    "backbone": "~1.1.2",
+    "marked": "~0.3.2"
   }
 }
