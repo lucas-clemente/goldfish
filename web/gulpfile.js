@@ -10,6 +10,7 @@ var config = {
   js: {
     src: [
       'js/models/*.js',
+      'js/views/*.js',
       'js/app.js',
     ],
     dest: 'dist/assets',
@@ -83,7 +84,6 @@ gulp.task('server', function() {
 });
 
 gulp.task('watch', ['server'], function () {
-  gulp.watch([config.js.src, config.css.src, config.html.src], ['html', 'js', 'css']);
 });
 
 
