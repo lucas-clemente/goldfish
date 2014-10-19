@@ -22,18 +22,27 @@ var App = Backbone.Router.extend({
   },
 
   folder: function (folder) {
-    window.appView.setFolder(folder || '/');
+    if (folder) {
+      // Normal folder
+      folder = "/" + folder + "/";
+    } else {
+      // Root
+      folder = "/";
+    }
+    console.log("setting folder", folder);
+    window.appView.setFolder(folder);
   },
 
   page: function (folder, page) {
     if (!page) {
-      // Root page
-      page = '/' + folder;
-      folder = '/';
+      // Root page, swap page and folder
+      folder = [page, page = folder][0];
+      page = "/" + page;
     } else {
-      page = folder + '/' + page;
+      page = "/" + folder + '/' + page;
     }
-    window.appView.setFolder(folder);
+    console.log("setting page", page);
+    this.folder(folder);
     window.appView.setPage(page);
   },
 });
