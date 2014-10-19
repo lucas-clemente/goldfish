@@ -28,32 +28,36 @@ var App = Backbone.Router.extend({
   page: function (folder, page) {
     if (!page) {
       // Root page
-      page = folder;
+      page = '/' + folder;
       folder = '/';
     } else {
       page = folder + '/' + page;
     }
     window.appView.setFolder(folder);
-    var model = window.appView.pageList.get(page);
-    window.appView.pageView.setModel(model);
+    window.appView.setPage(page);
   },
 });
 
 
 var AppView = Backbone.View.extend({
   folder: new Folder(),
+  page: new Page(),
 
   initialize: function () {
-    this.pageView = new PageView({model: new Page({id: "/"})});
-    $('#page').append(this.pageView.el);
     this.pageListView = new PageListView({model: this.folder});
     $('#list').append(this.pageListView.el);
+    this.pageView = new PageView({model: this.page});
+    $('#page').append(this.pageView.el);
   },
 
   setFolder: function (path) {
     this.folder.id = path;
-    var _this = this;
     this.folder.fetch();
+  },
+
+  setPage: function (path) {
+    this.page.id = path;
+    this.page.fetch();
   },
 });
 

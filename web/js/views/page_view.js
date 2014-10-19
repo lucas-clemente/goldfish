@@ -1,18 +1,11 @@
 export default Backbone.View.extend({
   template: _.template($('#template-page').html()),
 
-  render: function () {
-    this.$el.html(this.model.get("html"));
+  initialize: function () {
+    this.model.on("change", this.render, this);
   },
 
-  setModel: function (model) {
-    this.model = model;
-    if (!this.model.get("loaded")) {
-      this.model.set('html', this.template(this.model));
-      this.model.set("loaded", true);
-      this.render();
-    } else {
-      this.render();
-    }
-  }
+  render: function () {
+    this.$el.html(this.template(this.model.attributes));
+  },
 });
