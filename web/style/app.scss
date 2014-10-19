@@ -1,3 +1,4 @@
+$font-size-base: 14px;
 @import 'bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap';
 
 $fa-font-path: "/assets/fonts";
@@ -17,5 +18,22 @@ $fa-font-path: "/assets/fonts";
 .folder-up-item {
   i {
     margin-right: 8px;
+  }
+}
+
+
+// Page
+
+.page-contents {
+  .image {
+    text-align: center;
+  }
+
+  img {
+    padding: 5px;
+    /* box-shadow: 1px 1px 5px gray; */
+    margin: 20px 0;
+    height: auto;
+    max-width: 80%;
   }
 }

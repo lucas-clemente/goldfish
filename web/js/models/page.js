@@ -35,6 +35,18 @@ export default Backbone.Model.extend({
       this.attributes.title = this.name();
       markdownRaw = this.attributes.text;
     }
-    this.attributes.markdown = marked(markdownRaw);
+
+    var renderer = new marked.Renderer();
+    var _this = this;
+    renderer.image = function (href, title, text) {
+      if (href[0] == '/') {
+        href = '/v1' + href;
+      } else {
+        href = '/v1' + _this.id.slice(0, _this.id.lastIndexOf('/')+1) + href;
+      }
+      console.log(href);
+      return '<div class="image"><img src="' + href + '" title="' + (title || '') + '" class="img-thumbnail" /></div>';
+    };
+    this.attributes.markdown = marked(markdownRaw, {renderer: renderer});
   },
 });
