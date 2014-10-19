@@ -36,6 +36,17 @@ export default Backbone.Model.extend({
       markdownRaw = this.attributes.text;
     }
 
+    // Replace [[links]]
+
+    // Images, e.g. [[foo.jpg]]
+    markdownRaw = markdownRaw.replace(/\[\[([^|\]]+\.(?:jpg|png))\]\]/g, "![$1]($1)");
+    // [[foo]]
+    markdownRaw = markdownRaw.replace(/\[\[([^|\]]+)\]\]/g, "[$1]($1)");
+    // [[foo|bar]]
+    markdownRaw = markdownRaw.replace(/\[\[([^|\]]+)\|([^\]]+)\]\]/g, "[$1]($2)");
+
+    // Render markdown
+
     var renderer = new marked.Renderer();
     var _this = this;
     renderer.image = function (href, title, text) {
