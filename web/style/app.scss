@@ -21,6 +21,12 @@ $fa-font-path: "/assets/fonts";
   }
 }
 
+a.list-group-item:active {
+    background-color: lighten(#428bca, 20%);
+    border-color: lighten(#428bca, 20%);
+    color: #fff;
+}
+
 
 // Page
 
