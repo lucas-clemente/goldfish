@@ -5,19 +5,14 @@ export default Backbone.View.extend({
   className: 'list-group',
 
   initialize: function () {
-    this.collection.on("reset", this.render, this);
+    this.model.on("change", this.render, this);
   },
 
   render: function () {
-    this.addAll();
+    this.$el.empty();
+    this.model.attributes.pages.forEach(function (page) {
+      var itemView = new PageItemView({model: page});
+      this.$el.append(itemView.render().el);
+    }, this);
   },
-
-  addOne: function (page) {
-    var itemView = new PageItemView({model: page});
-    this.$el.append(itemView.render().el);
-  },
-
-  addAll: function () {
-    this.collection.forEach(this.addOne, this);
-  }
 });

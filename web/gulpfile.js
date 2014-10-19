@@ -17,8 +17,10 @@ var config = {
 
   js: {
     src: [
-      'js/models/*.js',
+      'js/models/page.js',
+      'js/models/folder.js',
       'js/views/*.js',
+      'js/collections/*.js',
       'js/app.js',
     ],
     dest: 'dist/assets',

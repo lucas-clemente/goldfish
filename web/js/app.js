@@ -1,10 +1,8 @@
 import Page from 'page';
+import Folder from 'folder';
 import PageListView from 'page_list_view';
 import PageView from 'page_view';
 
-var PageList = Backbone.Collection.extend({
-  model: Page
-});
 
 var App = Backbone.Router.extend({
   initialize: function () {
@@ -24,49 +22,52 @@ var App = Backbone.Router.extend({
   },
 
   folder: function (folder) {
-    console.log("folder: ", folder);
+    window.appView.setFolder(folder || '/');
   },
 
   page: function (folder, page) {
     if (!page) {
+      // Root page
       page = folder;
-      folder = '';
+      folder = '/';
+    } else {
+      page = folder + '/' + page;
     }
-    var model = window.appView.pageList.get(folder + '/' + page);
+    window.appView.setFolder(folder);
+    var model = window.appView.pageList.get(page);
     window.appView.pageView.setModel(model);
   },
 });
 
+
 var AppView = Backbone.View.extend({
+  folder: new Folder(),
+
   initialize: function () {
     this.pageView = new PageView({model: new Page({id: "/"})});
     $('#page').append(this.pageView.el);
-    this.pageList = new PageList();
-    this.pageListView = new PageListView({collection: this.pageList});
+    this.pageListView = new PageListView({model: this.folder});
     $('#list').append(this.pageListView.el);
-    this.fetchCollections();
   },
 
-  fetchCollections: function () {
-    var items = [
-      {id: "/foo", text: "Foobar _emph_\n\n __strong__\n\n- list 1\n- list 2"},
-      {id: "/bar", text: "item two"},
-      {id: "/baz", text: "item three"},
-    ];
-    this.pageList.reset(items);
-  }
+  setFolder: function (path) {
+    this.folder.id = path;
+    var _this = this;
+    this.folder.fetch();
+  },
 });
+
 
 // From https://gist.github.com/tbranyen/1142129
 $(document).delegate("a", "click", function(e) {
-  var href = $(this).attr("href");
+  var href = this.getAttribute("href");
   var protocol = this.protocol + "//";
-
   if (href.slice(protocol.length) !== protocol) {
     e.preventDefault();
     window.app.navigate(href, {trigger: true});
   }
 });
+
 
 $(function () {
   window.app = new App();
