@@ -3,14 +3,19 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	assetfs "github.com/elazarl/go-bindata-assetfs"
 	"github.com/lucas-clemente/notes/notes"
 )
 
-const path = "tmp/repo"
-
 func main() {
+	if len(os.Args) != 2 {
+		log.Fatal("Usage: ./notes <path/to/repo>")
+	}
+
+	path := os.Args[1]
+
 	repo, err := notes.NewGitRepo(path)
 	if err != nil {
 		log.Fatal(err)
