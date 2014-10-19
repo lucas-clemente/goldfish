@@ -9,6 +9,8 @@ var watch = require('gulp-watch');
 var traceur = require('gulp-traceur');
 var uglify = require('gulp-uglify');
 var minifyCss = require('gulp-minify-css');
+var url = require('url');
+var proxy = require('proxy-middleware');
 
 var config = {
   production: process.env.ENV === 'production',
@@ -110,10 +112,15 @@ gulp.task('server', function() {
     root: 'dist',
     fallback: 'index.html',
     livereload: true,
+    middleware: function(connect, o) {
+      var options = url.parse('http://localhost:3000/v1');
+      options.route = '/v1';
+      return [proxy(options)];
+    }
   });
 });
 
-gulp.task('watch', ['server'], function () {
+gulp.task('watch', ['default', 'server'], function () {
   gulp.watch([config.js.src, config.css.src, config.html.src], ['html', 'js', 'css']);
 });
 
