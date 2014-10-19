@@ -1,6 +1,6 @@
 import Page from 'page';
 import Folder from 'folder';
-import PageListView from 'page_list_view';
+import FolderListView from 'folder_list_view';
 import PageView from 'page_view';
 
 
@@ -44,8 +44,8 @@ var AppView = Backbone.View.extend({
   page: new Page(),
 
   initialize: function () {
-    this.pageListView = new PageListView({model: this.folder});
-    $('#list').append(this.pageListView.el);
+    this.folderListView = new FolderListView({model: this.folder});
+    $('#list').append(this.folderListView.el);
     this.pageView = new PageView({model: this.page});
     $('#page').append(this.pageView.el);
   },
