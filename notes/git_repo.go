@@ -95,6 +95,8 @@ func (r *gitRepo) StoreFile(p string, data io.Reader) error {
 }
 
 func (r *gitRepo) ListFiles(prefix string) ([]string, error) {
+	files := []string{}
+
 	commit, err := r.headCommit()
 	if err != nil {
 		return nil, err
@@ -107,18 +109,31 @@ func (r *gitRepo) ListFiles(prefix string) ([]string, error) {
 	}
 	defer tree.Free()
 
-	files := []string{}
-
-	// TODO use prefix to chose initial tree
-	err = tree.Walk(func(path string, e *git.TreeEntry) int {
-		f := "/" + path + e.Name
-		if e.Type == git.ObjectBlob && strings.HasPrefix(f, prefix) {
-			files = append(files, f)
+	if prefix != "/" {
+		prefixTreeID, err := tree.EntryByPath(strings.TrimPrefix(prefix, "/"))
+		if err != nil {
+			return nil, err
 		}
-		return 0
-	})
-	if err != nil {
-		return nil, err
+
+		tree, err = r.repo.LookupTree(prefixTreeID.Id)
+		if err != nil {
+			return nil, err
+		}
+		defer tree.Free()
+	}
+
+	var i uint64
+	for i = 0; i < tree.EntryCount(); i++ {
+		entry := tree.EntryByIndex(i)
+		f := prefix + entry.Name
+		switch entry.Type {
+		case git.ObjectBlob:
+			files = append(files, f)
+		case git.ObjectTree:
+			files = append(files, f+"/")
+		default:
+			panic("unexpected object in tree")
+		}
 	}
 
 	return files, nil

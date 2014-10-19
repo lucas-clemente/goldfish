@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"regexp"
 	"sort"
-	"strings"
 
 	"github.com/lucas-clemente/notes/notes"
 
@@ -36,9 +36,10 @@ func (r *mockRepo) StoreFile(path string, reader io.Reader) error {
 
 func (r *mockRepo) ListFiles(prefix string) ([]string, error) {
 	paths := []string{}
+	pathRegex := regexp.MustCompile(prefix + "[^/]*/?")
 	for p := range r.files {
-		if strings.HasPrefix(p, prefix) {
-			paths = append(paths, p)
+		if f := pathRegex.FindString(p); f != "" {
+			paths = append(paths, f)
 		}
 	}
 	sort.Strings(paths)
@@ -102,7 +103,7 @@ var _ = Describe("Handler", func() {
 		handler.ServeHTTP(resp, req)
 		Expect(resp.Code).To(Equal(http.StatusOK))
 		Expect(resp.Header().Get("Content-Type")).To(Equal("application/json"))
-		Expect(resp.Body.String()).To(MatchJSON(`["/baz", "/foo/bar.md"]`))
+		Expect(resp.Body.String()).To(MatchJSON(`["/baz", "/foo/"]`))
 	})
 
 	It("GETs subdir", func() {

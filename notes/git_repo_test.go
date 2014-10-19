@@ -81,9 +81,9 @@ var _ = Describe("Repo", func() {
 
 			files, err := repo.ListFiles("/")
 			Expect(err).To(BeNil())
-			Expect(files).To(Equal([]string{"/baz", "/foo/bar"}))
+			Expect(files).To(Equal([]string{"/baz", "/foo/"}))
 
-			files, err = repo.ListFiles("/foo")
+			files, err = repo.ListFiles("/foo/")
 			Expect(err).To(BeNil())
 			Expect(files).To(Equal([]string{"/foo/bar"}))
 		})
