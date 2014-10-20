@@ -39,7 +39,7 @@ var config = {
   },
 
   imgs: {
-    src: 'logo.svg',
+    src: 'images/*',
     dest: 'dist/assets',
   },
 
