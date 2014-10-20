@@ -12,7 +12,8 @@ debug:
 	go-bindata -prefix=web/dist -debug=true web/dist/...
 
 web:
-	cd web && ember build --production
+	rm -rf web/dist
+	cd web && ENV=production gulp
 
 bindata: web
 	go-bindata -prefix=web/dist web/dist/...
