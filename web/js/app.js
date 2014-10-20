@@ -81,6 +81,15 @@ $(document).delegate("a", "click", function(e) {
   }
 });
 
+marked.setOptions({
+  highlight: function (code, lang) {
+    if (lang) {
+      return hljs.highlight(lang, code).value;
+    } else {
+      return hljs.highlightAuto(code).value;
+    }
+  }
+});
 
 $(function () {
   window.app = new App();

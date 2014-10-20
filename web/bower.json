@@ -5,6 +5,7 @@
     "underscore": "~1.7.0",
     "backbone": "~1.1.2",
     "marked": "~0.3.2",
-    "fontawesome": "~4.2.0"
+    "fontawesome": "~4.2.0",
+    "highlightjs": "~8.3.0"
   }
 }

@@ -49,6 +49,14 @@ var config = {
       'bower_components/underscore/underscore.js',
       'bower_components/backbone/backbone.js',
       'bower_components/marked/lib/marked.js',
+      'bower_components/highlightjs/highlight.pack.js',
+    ],
+    dest: 'dist/assets',
+  },
+
+  vendor_css: {
+    src: [
+      'bower_components/highlightjs/styles/tomorrow.css',
     ],
     dest: 'dist/assets',
   },
@@ -111,6 +119,13 @@ gulp.task('vendor-js', function () {
     .pipe(gulp.dest(config.vendor_js.dest));
 });
 
+gulp.task('vendor-css', function () {
+  return gulp.src(config.vendor_css.src)
+    .pipe(concat({path: 'vendor.css'}))
+    .pipe(config.production ? minifyCss() : util.noop())
+    .pipe(gulp.dest(config.vendor_css.dest));
+});
+
 gulp.task('server', function() {
   connect.server({
     root: 'dist',
@@ -129,7 +144,7 @@ gulp.task('watch', ['default', 'server'], function () {
 });
 
 
-gulp.task('default', ['lint', 'js', 'css', 'html', 'vendor-js', 'imgs', 'fonts'], function () {
+gulp.task('default', ['lint', 'js', 'css', 'html', 'vendor-js', 'vendor-css', 'imgs', 'fonts'], function () {
   return gulp.src("dist/**")
     .pipe(size({
       showFiles: true
