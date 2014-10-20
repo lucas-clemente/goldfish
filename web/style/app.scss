@@ -13,6 +13,15 @@ $fa-font-path: "/assets/fonts";
   margin-top: 0;
 }
 
+.path {
+  font-family: $font-family-monospace;
+  font-size: 12px;
+  color: lighten($text-color, 30%);
+}
+
+
+// Folder list
+
 .file-item,
 .folder-item,
 .folder-up-item {
@@ -22,9 +31,9 @@ $fa-font-path: "/assets/fonts";
 }
 
 a.list-group-item:active {
-    background-color: lighten(#428bca, 20%);
-    border-color: lighten(#428bca, 20%);
-    color: #fff;
+  background-color: lighten(#428bca, 20%);
+  border-color: lighten(#428bca, 20%);
+  color: #fff;
 }
 
 
