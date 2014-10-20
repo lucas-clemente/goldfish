@@ -1,7 +1,8 @@
 import Page from 'page';
 import Folder from 'folder';
 import FolderListView from 'folder_list_view';
-import PageView from 'page_view';
+import DetailView from 'detail_view';
+import fileFactory from 'file_factory';
 
 
 var App = Backbone.Router.extend({
@@ -12,8 +13,8 @@ var App = Backbone.Router.extend({
   routes: {
     "":              "folder",
     "*folder/":      "folder",
-    "*folder/:page": "page",
-    ":page":         "page",
+    "*folder/:file": "detail",
+    ":file":         "detail",
   },
 
   updateHighlights: function (route) {
@@ -33,30 +34,29 @@ var App = Backbone.Router.extend({
     window.appView.setFolder(folder);
   },
 
-  page: function (folder, page) {
-    if (!page) {
-      // Root page, swap page and folder
-      folder = [page, page = folder][0];
-      page = "/" + page;
+  detail: function (folder, path) {
+    if (!path) {
+      // Root path, swap path and folder
+      folder = [path, path = folder][0];
+      path = "/" + path;
     } else {
-      page = "/" + folder + '/' + page;
+      path = "/" + folder + '/' + path;
     }
-    console.log("setting page", page);
+    console.log("setting detail path", path);
     this.folder(folder);
-    window.appView.setPage(page);
+    window.appView.setDetail(path);
   },
 });
 
 
 var AppView = Backbone.View.extend({
   folder: new Folder(),
-  page: new Page(),
 
   initialize: function () {
     this.folderListView = new FolderListView({model: this.folder});
     $('#list').append(this.folderListView.el);
-    this.pageView = new PageView({model: this.page});
-    $('#page').append(this.pageView.el);
+    this.detailView = new DetailView();
+    $('#page').append(this.detailView.el);
   },
 
   setFolder: function (path) {
@@ -64,9 +64,12 @@ var AppView = Backbone.View.extend({
     this.folder.fetch();
   },
 
-  setPage: function (path) {
-    this.page.id = path;
-    this.page.fetch();
+  setDetail: function (path) {
+    var klass = fileFactory(path);
+    var model = new klass({id: path});
+    model.loading = true;
+    model.fetch();
+    this.detailView.setModel(model);
   },
 });
 

@@ -1,10 +1,10 @@
-import Page from 'page';
+import fileFactory from 'file_factory';
 
 var Folder = Backbone.Model.extend({
   namespace: '/v1',
 
   defaults: {
-    pages: [],
+    files: [],
     subFolders: [],
   },
 
@@ -16,22 +16,17 @@ var Folder = Backbone.Model.extend({
     var _this = this;
     return $.ajax(this.namespace + this.id)
       .done(function (data) {
-        var pages = data
-          .filter(function (id) {
-            return id[id.length-1] !== "/";
-          })
-          .map(function (id) {
-            return new Page({id: id});
-          });
-        var subFolders = data
-          .filter(function (id) {
-            return id[id.length-1] === "/";
-          })
-          .map(function (id) {
-            return new Folder({id: id});
-          });
+        var files = [], subFolders = [];
+        data.forEach(function (path) {
+          if (path[path.length-1] == '/') {
+            subFolders.push(new Folder({id: path}));
+          } else {
+            var klass = fileFactory(path);
+            files.push(new klass({id: path}));
+          }
+        });
         opts.success({
-          pages: pages,
+          files: files,
           subFolders: subFolders,
         });
       })

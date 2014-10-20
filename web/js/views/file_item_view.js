@@ -1,7 +1,7 @@
 export default Backbone.View.extend({
   tagName: 'a',
   className: 'list-group-item file-item',
-  template: _.template($('#template-page-item').html()),
+  template: _.template($('#template-file-item').html()),
 
   render: function () {
     var href = this.model.id;

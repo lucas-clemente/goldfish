@@ -18,11 +18,14 @@ var config = {
   js: {
     src: [
       'js/models/page.js',
+      'js/models/image.js',
+      'js/models/file.js',
+      'js/file_factory.js',
       'js/models/folder.js',
       'js/views/folder_item_view.js',
-      'js/views/page_item_view.js',
+      'js/views/file_item_view.js',
       'js/views/folder_list_view.js',
-      'js/views/page_view.js',
+      'js/views/detail_view.js',
       'js/app.js',
     ],
     dest: 'dist/assets',

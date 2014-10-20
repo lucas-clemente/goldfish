@@ -54,15 +54,35 @@
 
 <script type="text/template" id="template-page">
   <div class="page-header">
-    <h1><%= title %></h1>
+    <h1><%= attributes.title %></h1>
   </div>
   <div class="page-contents">
-    <%= markdown %>
+    <%= attributes.markdown %>
   </div>
 </script>
 
-<script type="text/template" id="template-page-item">
-  <i class="fa fa-file-text-o"></i> <%= name() %>
+<script type="text/template" id="template-image">
+  <div class="page-header">
+    <h1><%= name() %></h1>
+  </div>
+  <div class="page-contents">
+    <div class="image">
+      <img src="/v1<%= id %>">
+    </div>
+  </div>
+</script>
+
+<script type="text/template" id="template-file">
+  <div class="page-header">
+    <h1><%= name() %></h1>
+  </div>
+  <div class="page-no-contents">
+    Goldfish doesn't know how to display this file :-(
+  </div>
+</script>
+
+<script type="text/template" id="template-file-item">
+  <i class="fa <%= icon %>"></i> <%= name() %>
 </script>
 
 <script type="text/template" id="template-folder-item">

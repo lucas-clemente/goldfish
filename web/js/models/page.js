@@ -1,5 +1,7 @@
-export default Backbone.Model.extend({
+var Page = Backbone.Model.extend({
   namespace: '/v1',
+  icon: 'fa-file-text-o',
+  type: "page",
 
   defaults: {
     text: "",
@@ -19,6 +21,7 @@ export default Backbone.Model.extend({
     var _this = this;
     return $.ajax(this.namespace + this.id)
       .done(function (data) {
+        this.loading = false;
         opts.success({text: data});
       })
       .fail(opts.fail);
@@ -64,3 +67,5 @@ export default Backbone.Model.extend({
     this.attributes.markdown = marked(markdownRaw, {renderer: renderer});
   },
 });
+
+export default Page;

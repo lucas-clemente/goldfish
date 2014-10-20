@@ -1,4 +1,4 @@
-import PageItemView from 'page_item_view';
+import FileItemView from 'file_item_view';
 import FolderItemView from 'folder_item_view';
 
 export default Backbone.View.extend({
@@ -21,8 +21,8 @@ export default Backbone.View.extend({
     this.model.attributes.subFolders.forEach(function (f) {
       this.$el.append((new FolderItemView({model: f})).render().el);
     }, this);
-    this.model.attributes.pages.forEach(function (p) {
-      this.$el.append((new PageItemView({model: p})).render().el);
+    this.model.attributes.files.forEach(function (p) {
+      this.$el.append((new FileItemView({model: p})).render().el);
     }, this);
   },
 });
