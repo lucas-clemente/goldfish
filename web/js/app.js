@@ -71,11 +71,9 @@ var AppView = Backbone.View.extend({
 });
 
 
-// From https://gist.github.com/tbranyen/1142129
-$(document).delegate("a", "click", function(e) {
+$(document).on('click', 'a', function(e) {
   var href = this.getAttribute("href");
-  var protocol = this.protocol + "//";
-  if (href.slice(protocol.length) !== protocol) {
+  if (href[0] == "/") {
     e.preventDefault();
     window.app.navigate(href, {trigger: true});
   }
