@@ -89,6 +89,13 @@ marked.setOptions({
   }
 });
 
+window.MathJax = {
+  tex2jax: {
+    inlineMath: [['$$', '$$']],
+    displayMath: [['\\[', '\\]']],
+  }
+};
+
 $(function () {
   window.app = new App();
   window.appView = new AppView();

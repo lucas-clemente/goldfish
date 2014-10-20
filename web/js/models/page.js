@@ -36,6 +36,10 @@ export default Backbone.Model.extend({
       markdownRaw = this.attributes.text;
     }
 
+    // Escape \[ and \] to \\[ and \\]
+    markdownRaw = markdownRaw.replace('\\[', '\\\\[');
+    markdownRaw = markdownRaw.replace('\\]', '\\\\]');
+
     // Replace [[links]]
 
     // Images, e.g. [[foo.jpg]]
@@ -55,7 +59,6 @@ export default Backbone.Model.extend({
       } else {
         href = '/v1' + _this.id.slice(0, _this.id.lastIndexOf('/')+1) + href;
       }
-      console.log(href);
       return '<div class="image"><img src="' + href + '" title="' + (title || '') + '" class="img-thumbnail" /></div>';
     };
     this.attributes.markdown = marked(markdownRaw, {renderer: renderer});
