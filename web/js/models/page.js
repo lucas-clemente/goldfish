@@ -40,8 +40,8 @@ var Page = Backbone.Model.extend({
     }
 
     // Escape \[ and \] to \\[ and \\]
-    markdownRaw = markdownRaw.replace('\\[', '\\\\[');
-    markdownRaw = markdownRaw.replace('\\]', '\\\\]');
+    markdownRaw = markdownRaw.replace(/\\\[/g, '\\\\[');
+    markdownRaw = markdownRaw.replace(/\\\]/g, '\\\\]');
 
     // Replace [[links]]
 
