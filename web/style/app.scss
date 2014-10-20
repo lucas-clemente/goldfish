@@ -52,3 +52,33 @@ a.list-group-item:active {
     max-width: 90%;
   }
 }
+
+
+// Footer
+
+$footer-height: 100px;
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: $footer-height;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: $footer-height;
+  border-top: 1px solid #f5f5f5;
+  padding-top: 30px;
+  text-align: center;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+#logo-footer {
+  height: 0.8em;
+}
