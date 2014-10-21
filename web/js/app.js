@@ -6,20 +6,11 @@ import fileFactory from 'file_factory';
 
 
 var App = Backbone.Router.extend({
-  initialize: function () {
-    this.bind('all', this.updateHighlights);
-  },
-
   routes: {
     "":              "folder",
     "*folder/":      "folder",
     "*folder/:file": "detail",
     ":file":         "detail",
-  },
-
-  updateHighlights: function (route) {
-    $('a[href="' + window.location.pathname + '"]').addClass("active");
-    $('a[href!="' + window.location.pathname + '"]').removeClass("active");
   },
 
   folder: function (folder) {

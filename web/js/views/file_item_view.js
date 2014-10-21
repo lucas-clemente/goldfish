@@ -7,7 +7,7 @@ export default Backbone.View.extend({
     var href = this.model.id;
     this.$el.attr('href', href);
     this.$el.html(this.template(this.model));
-    if (window.location.pathname === href) {
+    if (decodeURIComponent(window.location.pathname) === href) {
       this.$el.addClass('active');
     }
     return this;
