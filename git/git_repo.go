@@ -1,4 +1,4 @@
-package notes
+package git
 
 import (
 	"io"
@@ -8,19 +8,20 @@ import (
 	"strings"
 	"time"
 
-	git "github.com/libgit2/git2go"
+	git2go "github.com/libgit2/git2go"
 )
 
-type gitRepo struct {
+// GitRepo is a git repository implementing the Repo interface for goldfish.
+type GitRepo struct {
 	path string
-	repo *git.Repository
+	repo *git2go.Repository
 }
 
 // NewGitRepo opens or makes a git repo at the given path
-func NewGitRepo(path string) (Repo, error) {
-	repo, err := git.OpenRepository(path)
+func NewGitRepo(path string) (*GitRepo, error) {
+	repo, err := git2go.OpenRepository(path)
 	if err != nil {
-		repo, err = git.InitRepository(path, false)
+		repo, err = git2go.InitRepository(path, false)
 		if err != nil {
 			return nil, err
 		}
@@ -43,25 +44,23 @@ func NewGitRepo(path string) (Repo, error) {
 		}
 
 		defer tree.Free()
-		sig := &git.Signature{Name: "system", Email: "notes@clemente.io", When: time.Now()}
+		sig := &git2go.Signature{Name: "system", Email: "notes@clemente.io", When: time.Now()}
 		_, err = repo.CreateCommit("refs/heads/master", sig, sig, "initial commit", tree)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	return &gitRepo{path: path, repo: repo}, nil
+	return &GitRepo{path: path, repo: repo}, nil
 }
 
-func (r *gitRepo) ReadFile(path string) (io.ReadCloser, error) {
-	f, err := os.Open(r.absolutePath(path))
-	if os.IsNotExist(err) {
-		return nil, NotFoundError{}
-	}
-	return f, err
+// ReadFile reads a file from the repo
+func (r *GitRepo) ReadFile(path string) (io.ReadCloser, error) {
+	return os.Open(r.absolutePath(path))
 }
 
-func (r *gitRepo) StoreFile(p string, data io.Reader) error {
+// StoreFile writes a file to the repo and commits it
+func (r *GitRepo) StoreFile(p string, data io.Reader) error {
 	if err := os.MkdirAll(path.Dir(r.absolutePath(p)), 0755); err != nil {
 		return err
 	}
@@ -94,7 +93,8 @@ func (r *gitRepo) StoreFile(p string, data io.Reader) error {
 	return r.commit(treeID, p)
 }
 
-func (r *gitRepo) ListFiles(prefix string) ([]string, error) {
+// ListFiles lists the files in a given directory
+func (r *GitRepo) ListFiles(prefix string) ([]string, error) {
 	files := []string{}
 
 	commit, err := r.headCommit()
@@ -127,9 +127,9 @@ func (r *gitRepo) ListFiles(prefix string) ([]string, error) {
 		entry := tree.EntryByIndex(i)
 		f := prefix + entry.Name
 		switch entry.Type {
-		case git.ObjectBlob:
+		case git2go.ObjectBlob:
 			files = append(files, f)
-		case git.ObjectTree:
+		case git2go.ObjectTree:
 			files = append(files, f+"/")
 		default:
 			panic("unexpected object in tree")
@@ -139,7 +139,7 @@ func (r *gitRepo) ListFiles(prefix string) ([]string, error) {
 	return files, nil
 }
 
-func (r *gitRepo) headCommit() (*git.Commit, error) {
+func (r *GitRepo) headCommit() (*git2go.Commit, error) {
 	headRef, err := r.repo.Head()
 	defer headRef.Free()
 	if err != nil {
@@ -150,7 +150,7 @@ func (r *gitRepo) headCommit() (*git.Commit, error) {
 	return r.repo.LookupCommit(headID)
 }
 
-func (r *gitRepo) commit(treeID *git.Oid, message string) error {
+func (r *GitRepo) commit(treeID *git2go.Oid, message string) error {
 	tree, err := r.repo.LookupTree(treeID)
 	if err != nil {
 		return err
@@ -163,7 +163,7 @@ func (r *gitRepo) commit(treeID *git.Oid, message string) error {
 	}
 	defer headCommit.Free()
 
-	sig := &git.Signature{Name: "system", Email: "notes@clemente.io", When: time.Now()}
+	sig := &git2go.Signature{Name: "system", Email: "notes@clemente.io", When: time.Now()}
 	_, err = r.repo.CreateCommit("refs/heads/master", sig, sig, message, tree, headCommit)
 	if err != nil {
 		return err
@@ -172,6 +172,6 @@ func (r *gitRepo) commit(treeID *git.Oid, message string) error {
 	return nil
 }
 
-func (r *gitRepo) absolutePath(path string) string {
+func (r *GitRepo) absolutePath(path string) string {
 	return r.path + path
 }

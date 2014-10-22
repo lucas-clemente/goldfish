@@ -1,4 +1,4 @@
-package notes_test
+package git_test
 
 import (
 	"bytes"
@@ -6,7 +6,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/lucas-clemente/notes/notes"
+	"github.com/lucas-clemente/notes/git"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -16,14 +16,14 @@ var _ = Describe("Repo", func() {
 	Context("git repos", func() {
 		var (
 			tempDir string
-			repo    notes.Repo
+			repo    *git.GitRepo
 		)
 
 		BeforeEach(func() {
 			var err error
-			tempDir, err = ioutil.TempDir("", "io.clemente.notes.test")
+			tempDir, err = ioutil.TempDir("", "io.clemente.git.test")
 			Expect(err).To(BeNil())
-			repo, err = notes.NewGitRepo(tempDir)
+			repo, err = git.NewGitRepo(tempDir)
 			Expect(err).To(BeNil())
 			Expect(repo).ToNot(BeNil())
 		})
@@ -91,7 +91,7 @@ var _ = Describe("Repo", func() {
 		It("handles not found", func() {
 			reader, err := repo.ReadFile("/foo")
 			Expect(reader).To(BeNil())
-			Expect(err).To(MatchError(notes.NotFoundError{}))
+			Expect(os.IsNotExist(err)).To(BeTrue())
 		})
 	})
 })

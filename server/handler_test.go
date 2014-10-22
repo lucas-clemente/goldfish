@@ -1,4 +1,4 @@
-package notes_test
+package server_test
 
 import (
 	"bytes"
@@ -6,10 +6,11 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"regexp"
 	"sort"
 
-	"github.com/lucas-clemente/notes/notes"
+	"github.com/lucas-clemente/notes/server"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -23,7 +24,7 @@ func (r *mockRepo) ReadFile(path string) (io.ReadCloser, error) {
 	if c, ok := r.files[path]; ok {
 		return ioutil.NopCloser(bytes.NewBufferString(c)), nil
 	}
-	return nil, notes.NotFoundError{}
+	return nil, os.ErrNotExist
 }
 func (r *mockRepo) StoreFile(path string, reader io.Reader) error {
 	c, err := ioutil.ReadAll(reader)
@@ -62,7 +63,7 @@ var _ = Describe("Handler", func() {
 	})
 
 	It("GETs pages", func() {
-		handler := notes.NewHandler(repo, "/v1")
+		handler := server.NewHandler(repo, "/v1")
 		req, err := http.NewRequest("GET", "/v1/foo/bar.md", nil)
 		Expect(err).To(BeNil())
 		handler.ServeHTTP(resp, req)
@@ -71,7 +72,7 @@ var _ = Describe("Handler", func() {
 	})
 
 	It("404s", func() {
-		handler := notes.NewHandler(repo, "/v1")
+		handler := server.NewHandler(repo, "/v1")
 		req, err := http.NewRequest("GET", "/v1/noooooooo", nil)
 		Expect(err).To(BeNil())
 		handler.ServeHTTP(resp, req)
@@ -79,7 +80,7 @@ var _ = Describe("Handler", func() {
 	})
 
 	It("POST updates pages", func() {
-		handler := notes.NewHandler(repo, "/v1")
+		handler := server.NewHandler(repo, "/v1")
 		req, err := http.NewRequest("POST", "/v1/foo/bar.md", bytes.NewBufferString("foobaz"))
 		Expect(err).To(BeNil())
 		handler.ServeHTTP(resp, req)
@@ -88,7 +89,7 @@ var _ = Describe("Handler", func() {
 	})
 
 	It("POSTs new pages", func() {
-		handler := notes.NewHandler(repo, "/v1")
+		handler := server.NewHandler(repo, "/v1")
 		req, err := http.NewRequest("POST", "/v1/new", bytes.NewBufferString("foobaz"))
 		Expect(err).To(BeNil())
 		handler.ServeHTTP(resp, req)
@@ -97,7 +98,7 @@ var _ = Describe("Handler", func() {
 	})
 
 	It("GETs root", func() {
-		handler := notes.NewHandler(repo, "/v1")
+		handler := server.NewHandler(repo, "/v1")
 		req, err := http.NewRequest("GET", "/v1/", nil)
 		Expect(err).To(BeNil())
 		handler.ServeHTTP(resp, req)
@@ -107,7 +108,7 @@ var _ = Describe("Handler", func() {
 	})
 
 	It("GETs subdir", func() {
-		handler := notes.NewHandler(repo, "/v1")
+		handler := server.NewHandler(repo, "/v1")
 		req, err := http.NewRequest("GET", "/v1/foo/", nil)
 		Expect(err).To(BeNil())
 		handler.ServeHTTP(resp, req)

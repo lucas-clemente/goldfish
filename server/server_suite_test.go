@@ -1,4 +1,4 @@
-package notes_test
+package server_test
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestNotes(t *testing.T) {
+func TestServer(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Notes Suite")
+	RunSpecs(t, "Server Suite")
 }
