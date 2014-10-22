@@ -1,4 +1,5 @@
 $font-size-base: 14px;
+$font-size-page: 15px;
 @import 'bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap';
 
 $fa-font-path: "/assets/fonts";
@@ -40,6 +41,7 @@ a.list-group-item:active {
 // Page
 
 .page-contents {
+  font-size: $font-size-page;
   .image {
     text-align: center;
   }
