@@ -87,6 +87,9 @@ window.MathJax = {
   tex2jax: {
     inlineMath: [['$$', '$$']],
     displayMath: [['\\[', '\\]']],
+  },
+  "HTML-CSS": {
+    scale: 90,
   }
 };
 
