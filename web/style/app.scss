@@ -52,6 +52,21 @@ a.list-group-item:active {
   }
 }
 
+.page-unsupported {
+  text-align: center;
+
+  img {
+    margin-top: 50px;
+    margin-bottom: 50px;
+    height: auto;
+    max-width: 60%;
+  }
+
+  p {
+    font-size: 18px;
+  }
+}
+
 
 // Footer
 

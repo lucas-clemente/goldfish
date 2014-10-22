@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="790px" height="309px" viewBox="0 0 790 309" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.1.1 (8761) - http://www.bohemiancoding.com/sketch -->
+    <title>Confused Fish</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Confused-Fish" sketch:type="MSLayerGroup" transform="translate(0.000000, -44.000000)">
+            <g id="Fish" transform="translate(0.000000, 44.000000)" fill="#333333" sketch:type="MSShapeGroup">
+                <path d="M709.773438,141.051919 C709.773438,141.051919 696.441406,0.00504779203 489.800781,0.00504779203 C283.160156,0.00504779203 173.453125,125.122238 173.453125,125.122238 C173.453125,125.122238 140,27.8331732 51.890625,0.00504773892 C49.9317099,-0.613648464 120.226562,55.6769155 104.1875,149.829259 C88.1484375,243.981603 -5.57054136e-08,267.83316 -5.57054136e-08,267.83316 C122.515625,272.563629 166.675781,174.423019 166.675781,174.423019 C166.675781,174.423019 185.300781,294.684739 417.164062,308.020673 C649.027344,321.356606 709.773438,141.051919 709.773438,141.051919 Z M611.083414,117 C624.384316,117 635.166827,106.217488 635.166827,92.9165865 C635.166827,79.6156845 624.384316,68.833173 611.083414,68.833173 C597.782512,68.833173 587,79.6156845 587,92.9165865 C587,106.217488 597.782512,117 611.083414,117 Z"></path>
+            </g>
+            <path d="M618.339844,209.074219 C632.69212,210.483787 636.447266,236.385105 657.074219,218.876953 C677.701172,201.368801 686.851562,228.679688 686.851562,228.679688" id="Path-3" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round" sketch:type="MSShapeGroup"></path>
+            <text id="?" sketch:type="MSTextLayer" font-family="Avenir" font-size="180" font-weight="normal" fill="#333333">
+                <tspan x="710" y="180">?</tspan>
+            </text>
+        </g>
+    </g>
+</svg>
