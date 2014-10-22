@@ -8,7 +8,9 @@ var File = Backbone.Model.extend({
   },
 
   sync: function (method, collection, opts) {
-    this.loading = false;
+    var d = $.Deferred();
+    d.resolve();
+    return d;
   },
 });
 

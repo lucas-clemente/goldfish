@@ -21,7 +21,6 @@ var Page = Backbone.Model.extend({
     var _this = this;
     return $.ajax(this.namespace + this.id)
       .done(function (data) {
-        this.loading = false;
         opts.success({text: data});
       })
       .fail(opts.fail);

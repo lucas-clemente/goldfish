@@ -58,9 +58,14 @@ var AppView = Backbone.View.extend({
   setDetail: function (path) {
     var klass = fileFactory(path);
     var model = new klass({id: path});
-    model.loading = true;
-    model.fetch();
-    this.detailView.setModel(model);
+    var _this = this;
+    model.fetch()
+      .done(function () {
+        _this.detailView.setModel(model);
+      })
+      .fail(function () {
+        _this.detailView.set404(path);
+      });
   },
 });
 
@@ -90,6 +95,9 @@ window.MathJax = {
   },
   "HTML-CSS": {
     scale: 90,
+    preferredFont: "STIX-Web",
+    webFont: "STIX-Web",
+    imageFont: null,
   }
 };
 

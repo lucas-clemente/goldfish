@@ -3,10 +3,10 @@ var DetailView = Backbone.View.extend({
     page: _.template($('#template-page').html()),
     image: _.template($('#template-image').html()),
     file: _.template($('#template-file').html()),
+    notFound: _.template($('#template-notfound').html()),
   },
 
   initialize: function () {
-    // this.model.on('change', this.render, this);
   },
 
   render: function () {
@@ -23,14 +23,13 @@ var DetailView = Backbone.View.extend({
   },
 
   setModel: function (model) {
-    if (this.model) {
-      this.model.off('change', this.render, this);
-    }
     this.model = model;
-    if (!this.model.loading) {
-      this.render();
-    }
-    this.model.on('change', this.render, this);
+    this.render();
+  },
+
+  set404: function (path) {
+    this.model = {type: "notFound", id: path};
+    this.render();
   },
 });
 
