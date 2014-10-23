@@ -37,6 +37,7 @@ var Page = Backbone.Model.extend({
       this.attributes.title = this.name();
       markdownRaw = this.attributes.text;
     }
+    window.app.setTitle(this.attributes.title);
 
     // Escape \[ and \] to \\[ and \\]
     markdownRaw = markdownRaw.replace(/\\\[/g, '\\\\[');

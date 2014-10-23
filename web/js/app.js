@@ -22,6 +22,7 @@ var App = Backbone.Router.extend({
       folder = "/";
     }
     console.log("setting folder", folder);
+    this.setTitle(folder);
     window.appView.setFolder(folder);
   },
 
@@ -35,7 +36,13 @@ var App = Backbone.Router.extend({
     }
     console.log("setting detail path", path);
     this.folder(folder);
+    this.setTitle(path.slice(path.lastIndexOf('/') + 1));
     window.appView.setDetail(path);
+  },
+
+  setTitle: function (title) {
+    console.log(title);
+    document.title = title + " — Goldfish";
   },
 });
 
