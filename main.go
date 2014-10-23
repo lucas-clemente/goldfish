@@ -7,7 +7,7 @@ import (
 
 	assetfs "github.com/elazarl/go-bindata-assetfs"
 
-	"github.com/lucas-clemente/logger"
+	"github.com/lucas-clemente/go-http-logger"
 	"github.com/lucas-clemente/notes/git"
 	"github.com/lucas-clemente/notes/server"
 )
