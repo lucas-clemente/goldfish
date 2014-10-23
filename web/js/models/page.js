@@ -46,10 +46,13 @@ var Page = Backbone.Model.extend({
 
     // Images, e.g. [[foo.jpg]]
     markdownRaw = markdownRaw.replace(/\[\[([^|\]]+\.(?:jpg|png))\]\]/g, "![$1]($1)");
+    // [[foo.extension]]
+    markdownRaw = markdownRaw.replace(/\[\[([^|\]]+)\.([^|\]\.]+)\]\]/g, "[$1]($1.$2)");
     // [[foo]]
-    markdownRaw = markdownRaw.replace(/\[\[([^|\]]+)\]\]/g, "[$1]($1)");
-    // [[foo|bar]]
-    markdownRaw = markdownRaw.replace(/\[\[([^|\]]+)\|([^\]]+)\]\]/g, "[$1]($2)");
+    markdownRaw = markdownRaw.replace(/\[\[([^|\]]+)\]\]/g, "[$1]($1.md)");
+    // [[foo|bar.extension]]
+    markdownRaw = markdownRaw.replace(/\[\[([^|\]]+)\|([^\]]+)\.([^\]\.]+)\]\]/g, "[$1]($2.$3)");
+    markdownRaw = markdownRaw.replace(/\[\[([^|\]]+)\|([^\]]+)\]\]/g, "[$1]($2.md)");
 
     // Render markdown
 
