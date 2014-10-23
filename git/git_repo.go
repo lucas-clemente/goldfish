@@ -163,15 +163,15 @@ func (r *GitRepo) commit(treeID *git2go.Oid, message string) error {
 	}
 	defer tree.Free()
 
-	if tree.Id() == treeID {
-		return nil
-	}
-
 	headCommit, err := r.headCommit()
 	if err != nil {
 		return err
 	}
 	defer headCommit.Free()
+
+	if *treeID == *headCommit.TreeId() {
+		return nil
+	}
 
 	sig := &git2go.Signature{Name: "system", Email: "goldfish@clemente.io", When: time.Now()}
 	_, err = r.repo.CreateCommit("refs/heads/master", sig, sig, message, tree, headCommit)
