@@ -70,7 +70,7 @@ var _ = Describe("Repo", func() {
 				cmd.Dir = tempDir
 				out, err := cmd.Output()
 				Expect(err).To(BeNil())
-				return strings.Contains(string(out), "Home.md")
+				return strings.Contains(string(out), "foo")
 			})
 		})
 
@@ -93,7 +93,7 @@ var _ = Describe("Repo", func() {
 				cmd.Dir = tempDir
 				out, err := cmd.Output()
 				Expect(err).To(BeNil())
-				return strings.Contains(string(out), "Home.md")
+				return strings.Contains(string(out), "foo")
 			})
 		})
 

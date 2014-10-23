@@ -63,7 +63,7 @@ func NewGitRepo(repoPath string) (*GitRepo, error) {
 
 	go func() {
 		for file := range tw.Changes() {
-			if strings.Contains(file, "/.git/") {
+			if strings.Contains(file, "/.git") {
 				continue
 			}
 			err := r.addAllAndCommit("changed " + path.Base(file))
@@ -134,6 +134,10 @@ func (r *GitRepo) addAllAndCommit(message string) error {
 	defer index.Free()
 
 	if err := index.AddAll([]string{}, git2go.IndexAddDefault, nil, nil); err != nil {
+		return err
+	}
+
+	if err := index.Write(); err != nil {
 		return err
 	}
 
