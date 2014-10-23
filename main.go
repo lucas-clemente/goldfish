@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	assetfs "github.com/elazarl/go-bindata-assetfs"
 
@@ -24,6 +26,10 @@ func main() {
 		log.Fatal(err)
 	}
 
+	port := 3456
+
+	fmt.Printf("🐟 Goldfish listening on http://localhost:%d\n", port)
+
 	http.Handle("/v1/", server.NewHandler(repo, "/v1"))
 	http.Handle("/assets/", http.FileServer(&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir}))
 	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
@@ -35,6 +41,6 @@ func main() {
 	})
 
 	log.Fatal(
-		http.ListenAndServe("localhost:3456", logger.Logger(http.DefaultServeMux)),
+		http.ListenAndServe("localhost:"+strconv.Itoa(port), logger.Logger(http.DefaultServeMux)),
 	)
 }
