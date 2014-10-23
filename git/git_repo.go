@@ -2,26 +2,29 @@ package git
 
 import (
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"path"
 	"strings"
 	"time"
 
-	git2go "github.com/libgit2/git2go"
+	git2go "github.com/lucas-clemente/git2go"
+	"github.com/lucas-clemente/treewatch"
 )
 
 // GitRepo is a git repository implementing the Repo interface for goldfish.
 type GitRepo struct {
 	path string
 	repo *git2go.Repository
+	tw   treewatch.TreeWatcher
 }
 
 // NewGitRepo opens or makes a git repo at the given path
-func NewGitRepo(path string) (*GitRepo, error) {
-	repo, err := git2go.OpenRepository(path)
+func NewGitRepo(repoPath string) (*GitRepo, error) {
+	repo, err := git2go.OpenRepository(repoPath)
 	if err != nil {
-		repo, err = git2go.InitRepository(path, false)
+		repo, err = git2go.InitRepository(repoPath, false)
 		if err != nil {
 			return nil, err
 		}
@@ -51,7 +54,31 @@ func NewGitRepo(path string) (*GitRepo, error) {
 		}
 	}
 
-	return &GitRepo{path: path, repo: repo}, nil
+	tw, err := treewatch.NewTreeWatcher(repoPath)
+	if err != nil {
+		return nil, err
+	}
+
+	r := &GitRepo{path: repoPath, repo: repo, tw: tw}
+
+	go func() {
+		for file := range tw.Changes() {
+			if strings.Contains(file, "/.git/") {
+				continue
+			}
+			err := r.addAllAndCommit("changed " + path.Base(file))
+			if err != nil {
+				log.Println(err)
+			}
+		}
+	}()
+
+	return r, nil
+}
+
+// StopWatching stops watching for changes in the repo
+func (r *GitRepo) StopWatching() {
+	r.tw.Stop()
 }
 
 // ReadFile reads a file from the repo
@@ -71,17 +98,42 @@ func (r *GitRepo) StoreFile(p string, data io.Reader) error {
 	}
 	defer file.Close()
 
-	if _, err := io.Copy(file, data); err != nil {
-		return err
+	_, err = io.Copy(file, data)
+	return err
+}
+
+// ListFiles lists the files in a given directory
+func (r *GitRepo) ListFiles(prefix string) ([]string, error) {
+	fileInfos, err := ioutil.ReadDir(r.absolutePath(prefix))
+	if err != nil {
+		return nil, err
 	}
 
+	files := make([]string, 0, len(fileInfos))
+
+	for _, f := range fileInfos {
+		name := f.Name()
+		if name[0] == '.' {
+			continue
+		}
+		name = prefix + name
+		if f.IsDir() {
+			name += "/"
+		}
+		files = append(files, name)
+	}
+
+	return files, nil
+}
+
+func (r *GitRepo) addAllAndCommit(message string) error {
 	index, err := r.repo.Index()
 	if err != nil {
 		return err
 	}
 	defer index.Free()
 
-	if err := index.AddByPath(p); err != nil {
+	if err := index.AddAll([]string{}, git2go.IndexAddDefault, nil, nil); err != nil {
 		return err
 	}
 
@@ -90,53 +142,7 @@ func (r *GitRepo) StoreFile(p string, data io.Reader) error {
 		return err
 	}
 
-	return r.commit(treeID, p)
-}
-
-// ListFiles lists the files in a given directory
-func (r *GitRepo) ListFiles(prefix string) ([]string, error) {
-	files := []string{}
-
-	commit, err := r.headCommit()
-	if err != nil {
-		return nil, err
-	}
-	defer commit.Free()
-
-	tree, err := commit.Tree()
-	if err != nil {
-		return nil, err
-	}
-	defer tree.Free()
-
-	if prefix != "/" {
-		prefixTreeID, err := tree.EntryByPath(strings.TrimPrefix(prefix, "/"))
-		if err != nil {
-			return nil, err
-		}
-
-		tree, err = r.repo.LookupTree(prefixTreeID.Id)
-		if err != nil {
-			return nil, err
-		}
-		defer tree.Free()
-	}
-
-	var i uint64
-	for i = 0; i < tree.EntryCount(); i++ {
-		entry := tree.EntryByIndex(i)
-		f := prefix + entry.Name
-		switch entry.Type {
-		case git2go.ObjectBlob:
-			files = append(files, f)
-		case git2go.ObjectTree:
-			files = append(files, f+"/")
-		default:
-			panic("unexpected object in tree")
-		}
-	}
-
-	return files, nil
+	return r.commit(treeID, message)
 }
 
 func (r *GitRepo) headCommit() (*git2go.Commit, error) {
@@ -156,6 +162,10 @@ func (r *GitRepo) commit(treeID *git2go.Oid, message string) error {
 		return err
 	}
 	defer tree.Free()
+
+	if tree.Id() == treeID {
+		return nil
+	}
 
 	headCommit, err := r.headCommit()
 	if err != nil {

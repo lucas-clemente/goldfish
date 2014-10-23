@@ -5,12 +5,24 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"strings"
+	"time"
 
 	"github.com/lucas-clemente/goldfish/git"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
+
+func ExpectSoon(f func() bool) {
+	for i := 0; i < 100; i++ {
+		if f() {
+			return
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+	Expect(f()).To(BeTrue())
+}
 
 var _ = Describe("Repo", func() {
 	Context("git repos", func() {
@@ -29,6 +41,9 @@ var _ = Describe("Repo", func() {
 		})
 
 		AfterEach(func() {
+			repo.StopWatching()
+			// Give the fs events some time to get processed before deleting the repo
+			time.Sleep(200 * time.Millisecond)
 			os.RemoveAll(tempDir)
 		})
 
@@ -50,11 +65,13 @@ var _ = Describe("Repo", func() {
 			Expect(err).To(BeNil())
 			Expect(data).To(Equal([]byte("foobar")))
 
-			cmd := exec.Command("git", "log")
-			cmd.Dir = tempDir
-			out, err := cmd.Output()
-			Expect(err).To(BeNil())
-			Expect(string(out)).To(ContainSubstring("Home.md"))
+			ExpectSoon(func() bool {
+				cmd := exec.Command("git", "log")
+				cmd.Dir = tempDir
+				out, err := cmd.Output()
+				Expect(err).To(BeNil())
+				return strings.Contains(string(out), "Home.md")
+			})
 		})
 
 		It("updates and reads files", func() {
@@ -70,6 +87,14 @@ var _ = Describe("Repo", func() {
 			data, err := ioutil.ReadAll(reader)
 			Expect(err).To(BeNil())
 			Expect(data).To(Equal([]byte("foobaz")))
+
+			ExpectSoon(func() bool {
+				cmd := exec.Command("git", "log")
+				cmd.Dir = tempDir
+				out, err := cmd.Output()
+				Expect(err).To(BeNil())
+				return strings.Contains(string(out), "Home.md")
+			})
 		})
 
 		It("lists files", func() {
