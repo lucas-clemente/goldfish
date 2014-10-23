@@ -25,7 +25,14 @@ func main() {
 	}
 
 	http.Handle("/v1/", server.NewHandler(repo, "/v1"))
-	http.Handle("/", http.FileServer(&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir}))
+	http.Handle("/assets/", http.FileServer(&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir}))
+	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+		index, err := Asset("index.html")
+		if err != nil {
+			panic("could not find index.html")
+		}
+		w.Write(index)
+	})
 
 	log.Fatal(
 		http.ListenAndServe("localhost:3456", logger.Logger(http.DefaultServeMux)),
