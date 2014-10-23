@@ -10,7 +10,7 @@ import (
 	"regexp"
 	"sort"
 
-	"github.com/lucas-clemente/notes/server"
+	"github.com/lucas-clemente/goldfish/server"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

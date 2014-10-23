@@ -6,7 +6,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/lucas-clemente/notes/git"
+	"github.com/lucas-clemente/goldfish/git"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

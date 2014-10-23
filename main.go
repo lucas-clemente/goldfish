@@ -8,13 +8,13 @@ import (
 	assetfs "github.com/elazarl/go-bindata-assetfs"
 
 	"github.com/lucas-clemente/go-http-logger"
-	"github.com/lucas-clemente/notes/git"
-	"github.com/lucas-clemente/notes/server"
+	"github.com/lucas-clemente/goldfish/git"
+	"github.com/lucas-clemente/goldfish/server"
 )
 
 func main() {
 	if len(os.Args) != 2 {
-		log.Fatal("Usage: ./notes <path/to/repo>")
+		log.Fatal("Usage: ./goldfish <path/to/repo>")
 	}
 
 	path := os.Args[1]

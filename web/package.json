@@ -1,8 +1,8 @@
 {
-  "name": "notes",
+  "name": "goldfish",
   "version": "1.0.0",
   "description": "Simple notes webapp.",
-  "repository": "https://tougithub.com/lucas-clemente/notes",
+  "repository": "https://tougithub.com/lucas-clemente/goldfish",
   "main": "gulpfile.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

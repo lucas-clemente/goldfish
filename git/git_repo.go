@@ -44,7 +44,7 @@ func NewGitRepo(path string) (*GitRepo, error) {
 		}
 
 		defer tree.Free()
-		sig := &git2go.Signature{Name: "system", Email: "notes@clemente.io", When: time.Now()}
+		sig := &git2go.Signature{Name: "system", Email: "goldfish@clemente.io", When: time.Now()}
 		_, err = repo.CreateCommit("refs/heads/master", sig, sig, "initial commit", tree)
 		if err != nil {
 			return nil, err
@@ -163,7 +163,7 @@ func (r *GitRepo) commit(treeID *git2go.Oid, message string) error {
 	}
 	defer headCommit.Free()
 
-	sig := &git2go.Signature{Name: "system", Email: "notes@clemente.io", When: time.Now()}
+	sig := &git2go.Signature{Name: "system", Email: "goldfish@clemente.io", When: time.Now()}
 	_, err = r.repo.CreateCommit("refs/heads/master", sig, sig, message, tree, headCommit)
 	if err != nil {
 		return err

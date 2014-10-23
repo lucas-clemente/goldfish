@@ -19,4 +19,4 @@ bindata: web
 	go-bindata -prefix=web/dist web/dist/...
 
 build: bindata
-	go build -o build/notes
+	go build -o build/goldfish
