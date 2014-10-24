@@ -18,12 +18,12 @@ var Page = Backbone.Model.extend({
   },
 
   sync: function (method, collection, opts) {
-    var _this = this;
-    return $.ajax(this.namespace + this.id)
-      .done(function (data) {
-        opts.success({text: data});
-      })
-      .fail(opts.fail);
+    var url = 'ws://' + window.location.host + this.namespace + this.id;
+    console.log('connecting to', url);
+    this.ws = new WebSocket(url);
+    this.ws.onmessage = function (event) {
+      opts.success({text: event.data});
+    };
   },
 
   updateMarkdown: function () {
@@ -68,6 +68,10 @@ var Page = Backbone.Model.extend({
       return '<div class="image"><img src="' + href + '" title="' + (title || '') + '" class="img-thumbnail" /></div>';
     };
     this.attributes.markdown = marked(markdownRaw, {renderer: renderer});
+  },
+
+  release: function () {
+    this.ws.close();
   },
 });
 

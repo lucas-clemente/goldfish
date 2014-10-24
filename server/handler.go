@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 	"strings"
+
+	"code.google.com/p/go.net/websocket"
 )
 
 type handler struct {
@@ -29,6 +31,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
 		if path[len(path)-1] == '/' {
+			// Folder
 			files, err := h.repo.ListFiles(path)
 			if err != nil {
 				handleError(err, w)
@@ -44,7 +47,20 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
 
 			w.Write(data)
+		} else if r.Header.Get("Connection") == "Upgrade" {
+			// Page via websocket
+			websocket.Handler(func(conn *websocket.Conn) {
+				c, err := h.repo.ReadFile(path)
+				if err != nil {
+					log.Printf("error in ws: %s\n", err.Error())
+				}
+				defer c.Close()
+				if _, err := io.Copy(conn, c); err != nil {
+					log.Printf("error in ws: %s\n", err.Error())
+				}
+			}).ServeHTTP(w, r)
 		} else {
+			// Normal file
 			c, err := h.repo.ReadFile(path)
 			if err != nil {
 				handleError(err, w)

@@ -41,7 +41,6 @@ var App = Backbone.Router.extend({
   },
 
   setTitle: function (title) {
-    console.log(title);
     document.title = title + " — Goldfish";
   },
 });
@@ -66,13 +65,14 @@ var AppView = Backbone.View.extend({
     var klass = fileFactory(path);
     var model = new klass({id: path});
     var _this = this;
-    model.fetch()
-      .done(function () {
+    model.fetch({
+      success: function () {
         _this.detailView.setModel(model);
-      })
-      .fail(function () {
+      },
+      fail: function () {
         _this.detailView.set404(path);
-      });
+      }
+    });
   },
 });
 

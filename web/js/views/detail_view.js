@@ -23,6 +23,9 @@ var DetailView = Backbone.View.extend({
   },
 
   setModel: function (model) {
+    if (this.model && this.model !== model && this.model.release) {
+      this.model.release();
+    }
     this.model = model;
     this.render();
   },
