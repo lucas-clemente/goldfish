@@ -8,9 +8,7 @@ var Image = Backbone.Model.extend({
   },
 
   sync: function (method, collection, opts) {
-    var d = $.Deferred();
-    d.resolve();
-    return d;
+    opts.success({});
   },
 });
 
