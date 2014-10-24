@@ -50,25 +50,23 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		} else if r.Header.Get("Connection") == "Upgrade" {
 			// Page via websocket
 			websocket.Handler(func(conn *websocket.Conn) {
-				c, err := h.repo.ReadFile(path)
-				if err != nil {
+				changes := h.repo.Observer()
+				defer h.repo.CloseObserver(changes)
+				if err := h.serveFile(path, conn); err != nil {
 					log.Printf("error in ws: %s\n", err.Error())
 				}
-				defer c.Close()
-				if _, err := io.Copy(conn, c); err != nil {
-					log.Printf("error in ws: %s\n", err.Error())
+				for changedFile := range changes {
+					if changedFile == path {
+						if err := h.serveFile(path, conn); err != nil {
+							log.Printf("error in ws: %s\n", err.Error())
+						}
+					}
 				}
 			}).ServeHTTP(w, r)
 		} else {
 			// Normal file
-			c, err := h.repo.ReadFile(path)
-			if err != nil {
+			if err := h.serveFile(path, w); err != nil {
 				handleError(err, w)
-				return
-			}
-			defer c.Close()
-			if _, err := io.Copy(w, c); err != nil {
-				log.Println(err)
 			}
 		}
 
@@ -92,4 +90,16 @@ func handleError(err error, w http.ResponseWriter) {
 	} else {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+func (h *handler) serveFile(path string, w io.Writer) error {
+	c, err := h.repo.ReadFile(path)
+	if err != nil {
+		return err
+	}
+	defer c.Close()
+	if _, err := io.Copy(w, c); err != nil {
+		log.Println(err)
+	}
+	return nil
 }

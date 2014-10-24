@@ -47,6 +47,14 @@ func (r *mockRepo) ListFiles(prefix string) ([]string, error) {
 	return paths, nil
 }
 
+func (r *mockRepo) Observer() <-chan string {
+	panic("not implemented")
+}
+
+func (r *mockRepo) CloseObserver(<-chan string) {
+	panic("not implemented")
+}
+
 var _ = Describe("Handler", func() {
 	var (
 		repo *mockRepo
