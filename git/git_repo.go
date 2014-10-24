@@ -133,7 +133,11 @@ func (r *GitRepo) addAllAndCommit(message string) error {
 	}
 	defer index.Free()
 
-	if err := index.AddAll([]string{}, git2go.IndexAddDefault, nil, nil); err != nil {
+	if err := index.AddAll([]string{}, git2go.IndexAddDefault, nil); err != nil {
+		return err
+	}
+
+	if err := index.UpdateAll([]string{}, nil); err != nil {
 		return err
 	}
 
