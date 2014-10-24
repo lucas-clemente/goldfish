@@ -79,6 +79,7 @@ func NewGitRepo(repoPath string) (*GitRepo, error) {
 			go func() {
 				foChan <- file
 			}()
+			log.Printf("file %s changed\n", file)
 			err := r.addAllAndCommit("changed " + file)
 			if err != nil {
 				log.Println(err)
