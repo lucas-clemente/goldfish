@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -18,10 +19,16 @@ type GitRepo struct {
 	path string
 	repo *git2go.Repository
 	tw   treewatch.TreeWatcher
+	fo   *fanout
 }
 
 // NewGitRepo opens or makes a git repo at the given path
 func NewGitRepo(repoPath string) (*GitRepo, error) {
+	repoPath, err := filepath.EvalSymlinks(repoPath)
+	if err != nil {
+		return nil, err
+	}
+
 	repo, err := git2go.OpenRepository(repoPath)
 	if err != nil {
 		repo, err = git2go.InitRepository(repoPath, false)
@@ -59,18 +66,25 @@ func NewGitRepo(repoPath string) (*GitRepo, error) {
 		return nil, err
 	}
 
-	r := &GitRepo{path: repoPath, repo: repo, tw: tw}
+	foChan := make(chan string)
+	r := &GitRepo{path: repoPath, repo: repo, tw: tw, fo: newFanout(foChan)}
 
 	go func() {
 		for file := range tw.Changes() {
-			if strings.Contains(file, "/.git") {
+			file = strings.TrimPrefix(file, r.path)
+			if strings.HasPrefix(file, "/.git") {
 				continue
 			}
-			err := r.addAllAndCommit("changed " + path.Base(file))
+			// Don't block commits on network
+			go func() {
+				foChan <- file
+			}()
+			err := r.addAllAndCommit("changed " + file)
 			if err != nil {
 				log.Println(err)
 			}
 		}
+		close(foChan)
 	}()
 
 	return r, nil
@@ -124,6 +138,16 @@ func (r *GitRepo) ListFiles(prefix string) ([]string, error) {
 	}
 
 	return files, nil
+}
+
+// Observer sends file paths on changes
+func (r *GitRepo) Observer() <-chan string {
+	return r.fo.Output()
+}
+
+// CloseObserver closes an observer obtained from Observer()
+func (r *GitRepo) CloseObserver(c <-chan string) {
+	r.fo.Close(c)
 }
 
 func (r *GitRepo) addAllAndCommit(message string) error {
