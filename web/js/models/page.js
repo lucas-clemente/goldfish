@@ -24,6 +24,9 @@ var Page = Backbone.Model.extend({
     this.ws.onmessage = function (event) {
       opts.success({text: event.data});
     };
+    this.ws.onerror = function (event) {
+      opts.fail();
+    };
   },
 
   updateMarkdown: function () {

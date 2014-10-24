@@ -49,6 +49,16 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			w.Write(data)
 		} else if r.Header.Get("Connection") == "Upgrade" {
 			// Page via websocket
+
+			// First, test if file is readable
+			c, err := h.repo.ReadFile(path)
+			if err != nil {
+				handleError(err, w)
+				return
+			}
+			c.Close()
+
+			// If so, open ws and send file once, then on every change
 			websocket.Handler(func(conn *websocket.Conn) {
 				changes := h.repo.Observer()
 				defer h.repo.CloseObserver(changes)
