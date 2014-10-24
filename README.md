@@ -15,7 +15,18 @@ Future features:
 
 - Search
 - Auto-push
+- Auto-Update of folder listings (currently requires site reload)
 - Linux / Windows support
+
+## Usage
+
+```bash
+# Or whatever path suits you
+mkdir -p ~/goldfish
+./goldfish ~/goldfish
+```
+
+Then open the folder in your favorite editor and start writing those markdown files :)
 
 ## Screenshot time!
 
