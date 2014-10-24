@@ -19,4 +19,5 @@ bindata: web
 	go-bindata -prefix=web/dist web/dist/...
 
 build: bindata
-	go build -o build/goldfish
+	GOOS=darwin go build -o build/goldfish_osx
+	cd build && cp goldfish_osx goldfish && zip goldfish.osx.zip goldfish
