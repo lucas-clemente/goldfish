@@ -1,6 +1,8 @@
 # Goldfish
 
-A personal wiki / notes blend inspired by Evernote and gollum, based on git.
+A bring-your-own-editor personal wiki / notes blend powered by markdown and git.
+
+Inspired by Evernote and gollum.
 
 ## Features
 
