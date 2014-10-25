@@ -71,6 +71,9 @@ func NewGitRepo(repoPath string) (*GitRepo, error) {
 
 	go func() {
 		for file := range tw.Changes() {
+			if !strings.HasPrefix(file, r.path) {
+				continue
+			}
 			file = strings.TrimPrefix(file, r.path)
 			if strings.HasPrefix(file, "/.git") {
 				continue

@@ -1,5 +1,7 @@
 .PHONY: all deps debug web bindata build
 
+GOOS = $(shell go env GOOS)
+
 all: build
 
 deps:
@@ -19,5 +21,5 @@ bindata: web
 	go-bindata -prefix=web/dist web/dist/...
 
 build: bindata
-	GOOS=darwin go build -o build/goldfish_osx
-	cd build && cp goldfish_osx goldfish && zip goldfish.osx.zip goldfish
+	go build -o build/goldfish_$(GOOS)
+	cd build && cp goldfish_$(GOOS) goldfish && zip goldfish.$(GOOS).zip goldfish
