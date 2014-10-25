@@ -18,9 +18,11 @@ Future features:
 - Search
 - Auto-push
 - Auto-Update of folder listings (currently requires site reload)
-- Linux / Windows support
+- Windows support
 
 ## Usage
+
+If you're on linux, make sure to install either `libinotifytools` or `inotifytools`.
 
 ```bash
 # Or whatever path suits you
