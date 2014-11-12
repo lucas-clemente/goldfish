@@ -1,5 +1,7 @@
 # Goldfish
 
+[Download](https://github.com/lucas-clemente/goldfish/releases)
+
 A bring-your-own-editor personal wiki / notes blend powered by markdown and git.
 
 Inspired by Evernote and gollum.
