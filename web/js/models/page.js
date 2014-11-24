@@ -42,9 +42,22 @@ var Page = Backbone.Model.extend({
     }
     window.app.setTitle(this.attributes.title);
 
-    // Escape \[ and \] to \\[ and \\]
-    markdownRaw = markdownRaw.replace(/\\\[/g, '\\\\[');
-    markdownRaw = markdownRaw.replace(/\\\]/g, '\\\\]');
+    var multilineEqs = {};
+    var inlineEqs = {};
+
+    // Replace \[ and \] by placeholders
+    markdownRaw = markdownRaw.replace(/\\\[([^]*?)\\\]/gm, function(m, eq) {
+      var s = Math.random().toString(36).slice(2);
+      multilineEqs[s] = eq;
+      return s;
+    });
+
+    // Replace $$ ... $$ by placeholders
+    markdownRaw = markdownRaw.replace(/\$\$([^]*?)\$\$/gm, function(m, eq) {
+      var s = Math.random().toString(36).slice(2);
+      inlineEqs[s] = eq;
+      return s;
+    });
 
     // Replace [[links]]
 
@@ -70,7 +83,17 @@ var Page = Backbone.Model.extend({
       }
       return '<div class="image"><img src="' + href + '" title="' + (title || '') + '" class="img-thumbnail" /></div>';
     };
-    this.attributes.markdown = marked(markdownRaw, {renderer: renderer});
+    var markdownProcessed =  marked(markdownRaw, {renderer: renderer});
+
+    // Replace equations
+    for (var s in multilineEqs) {
+      markdownProcessed = markdownProcessed.replace(s, '<script type="math/tex; mode=display">' + multilineEqs[s] + '</script>');
+    }
+    for (var s in inlineEqs) {
+      markdownProcessed = markdownProcessed.replace(s, '<script type="math/tex">' + inlineEqs[s] + '</script>');
+    }
+
+    this.attributes.markdown = markdownProcessed;
   },
 
   release: function () {
