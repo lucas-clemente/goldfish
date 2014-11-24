@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"path/filepath"
 	"strconv"
 
 	assetfs "github.com/elazarl/go-bindata-assetfs"
@@ -27,6 +28,14 @@ func main() {
 	}
 
 	path := flag.Arg(0)
+	path, err := filepath.EvalSymlinks(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	path, err = filepath.Abs(path)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	repo, err := git.NewGitRepo(path)
 	if err != nil {
