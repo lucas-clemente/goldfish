@@ -1,10 +1,10 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 
 	assetfs "github.com/elazarl/go-bindata-assetfs"
@@ -17,18 +17,21 @@ import (
 )
 
 func main() {
-	if len(os.Args) != 2 {
+	var port int
+	flag.IntVar(&port, "p", 3456, "tcp port to listen on")
+
+	flag.Parse()
+
+	if flag.NArg() != 1 {
 		log.Fatal("Usage: ./goldfish <path/to/repo>")
 	}
 
-	path := os.Args[1]
+	path := flag.Arg(0)
 
 	repo, err := git.NewGitRepo(path)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	port := 3456
 
 	fmt.Printf("🐟 Goldfish listening on http://localhost:%d\n", port)
 

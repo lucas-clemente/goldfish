@@ -3,6 +3,7 @@
 ## 0.1.2 (unreleased)
 
 - Fixed latex rendering incorrectly sometimes (#22)
+- Added `-p` option to specify port
 
 ## 0.1.1 (2014-10-25)
 
