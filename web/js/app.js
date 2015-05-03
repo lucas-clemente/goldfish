@@ -97,7 +97,7 @@ marked.setOptions({
 
 window.MathJax = {
   tex2jax: {
-    inlineMath: [['$$', '$$']],
+    inlineMath: [['$', '$']],
     displayMath: [['\\[', '\\]']],
   },
   "HTML-CSS": {

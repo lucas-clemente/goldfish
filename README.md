@@ -11,7 +11,7 @@ Inspired by Evernote and gollum.
 - Just files on your disk. Actually, a git repo on your disk.
 - A server and a web-frontend, all in a single executable. The server manages files, your browser displays them.
 - Files are markdown with some extensions:
-  - LaTeX `$$\latex$$` or, if you want it on its own line, `\[ \latex \]`)
+  - LaTeX `$\latex$` or, if you want it on its own line, `\[ \latex \]`)
   - Easier links `[[foo]]`, also works for images `[[foo.png]]`
 - If you change files on disk, they are automagically committed and updated in your browser.
 
@@ -52,7 +52,7 @@ Things you can do:
 
 ## Equations
 
-Both $$e^\text{inline}$$ and in display mode:
+Both $e^\text{inline}$ and in display mode:
 
 \[
   e^{i \pi} = -1

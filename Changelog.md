@@ -1,5 +1,9 @@
 # Goldfish Changelog
 
+## 0.2.0 (unreleased)
+
+- Changed inline equations to use single `$` wrapper
+
 ## 0.1.2 (2014-11-24)
 
 - Added `-p` option to specify port

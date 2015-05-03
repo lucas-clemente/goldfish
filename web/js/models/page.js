@@ -52,8 +52,8 @@ var Page = Backbone.Model.extend({
       return s;
     });
 
-    // Replace $$ ... $$ by placeholders
-    markdownRaw = markdownRaw.replace(/\$\$([^]*?)\$\$/gm, function(m, eq) {
+    // Replace $ ... $ by placeholders
+    markdownRaw = markdownRaw.replace(/\$([^]*?)\$/gm, function(m, eq) {
       var s = Math.random().toString(36).slice(2);
       inlineEqs[s] = eq;
       return s;
