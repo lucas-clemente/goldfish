@@ -7,7 +7,12 @@ export default DS.Model.extend({
 
   markdownRenderer: null,
 
+  // Either the top level heading or the filename
   title: Ember.computed('path', 'text', function () {
+    var m = /^#(.*)\n/.exec(this.get('text'));
+    if (m) {
+      return m[1].trim();
+    }
     var path = this.get('path');
     return path.slice(path.lastIndexOf('/') + 1);
   }),
