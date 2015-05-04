@@ -45,6 +45,23 @@ export default DS.Model.extend({
     // Remove top level heading
     source = source.replace(/^#(.*)/, "");
 
+    var multilineEqs = {};
+    var inlineEqs = {};
+
+    // Replace \[ and \] by placeholders
+    source = source.replace(/\\\[([^]*?)\\\]/gm, function(m, eq) {
+      var s = Math.random().toString(36).slice(2);
+      multilineEqs[s] = eq;
+      return s;
+    });
+
+    // Replace $ ... $ by placeholders
+    source = source.replace(/\$([^]*?)\$/gm, function(m, eq) {
+      var s = Math.random().toString(36).slice(2);
+      inlineEqs[s] = eq;
+      return s;
+    });
+
     // Replace [[links]]
 
     // Images, e.g. [[foo.jpg]]
@@ -59,6 +76,14 @@ export default DS.Model.extend({
 
 
     var compiled = marked(source, {renderer: this.markdownRenderer});
+
+    // Replace equations
+    for (var mEq in multilineEqs) {
+      compiled = compiled.replace(mEq, '<div><script type="math/tex;mode=display">' + multilineEqs[mEq] + '</script></div>');
+    }
+    for (var iEq in inlineEqs) {
+      compiled = compiled.replace(iEq, '<span><script type="math/tex">' + inlineEqs[iEq] + '</script></span>');
+    }
 
     return compiled;
   }),

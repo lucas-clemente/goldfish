@@ -2,6 +2,7 @@
 
 ## 0.2.0 (unreleased)
 
+- Replaced mathjax with embedded katex, which means latex now works without internet connection
 - Changed inline equations to use single `$` wrapper
 
 ## 0.1.2 (2014-11-24)
