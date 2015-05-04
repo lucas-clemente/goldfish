@@ -18,6 +18,23 @@ $fa-font-path: "/assets/fonts";
 }
 
 
+// Page
+
+.page-contents {
+  font-size: $font-size-page;
+  .image {
+    text-align: center;
+  }
+
+  img {
+    padding: 5px;
+    margin: 20px 0;
+    height: auto;
+    max-width: 90%;
+  }
+}
+
+
 // Footer
 
 $footer-height: 100px;
