@@ -3,7 +3,8 @@
     "document",
     "window",
     "-Promise",
-    "marked"
+    "marked",
+    "katex"
   ],
   "browser": true,
   "boss": true,

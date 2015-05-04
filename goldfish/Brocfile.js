@@ -1,6 +1,7 @@
 /* global require, module */
 
 var EmberApp = require('ember-cli/lib/broccoli/ember-app');
+var glob = require('glob');
 
 var app = new EmberApp();
 
@@ -19,15 +20,23 @@ var app = new EmberApp();
 
 app.import('bower_components/bootstrap-sass-official/assets/javascripts/bootstrap.js');
 
-var faDir = {
-  destDir: 'fonts'
+var fontDir = {
+  destDir: 'assets/fonts'
 };
 
-app.import('bower_components/fontawesome/fonts/fontawesome-webfont.woff', faDir);
+app.import('bower_components/fontawesome/fonts/fontawesome-webfont.woff', fontDir);
 
 app.import('bower_components/highlightjs/highlight.pack.js');
 app.import('bower_components/highlightjs/styles/tomorrow.css');
 
 app.import('bower_components/marked/lib/marked.js');
+
+app.import('bower_components/katex-build/katex.min.js');
+app.import('bower_components/katex-build/katex.min.css');
+
+var fontFiles = glob.sync('bower_components/katex-build/fonts/*.woff');
+for (var i = 0; i < fontFiles.length; i++) {
+  app.import(fontFiles[i], fontDir);
+}
 
 module.exports = app.toTree();
