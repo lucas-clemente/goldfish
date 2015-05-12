@@ -2,19 +2,19 @@ import Ember from 'ember';
 import DS from 'ember-data';
 
 export default DS.Model.extend({
-  path: DS.attr('string'),
+  folder: DS.attr('string'),
   text: DS.attr('string'),
 
   markdownRenderer: null,
 
   // Either the top level heading or the filename
-  title: Ember.computed('path', 'text', function () {
+  title: Ember.computed('id', 'text', function () {
     var m = /^#(.*)\n/.exec(this.get('text'));
     if (m) {
       return m[1].trim();
     }
-    var path = this.get('path');
-    return path.slice(path.lastIndexOf('/') + 1);
+    var id = this.id;
+    return id.slice(id.lastIndexOf('/') + 1);
   }),
 
   init: function () {
@@ -25,7 +25,7 @@ export default DS.Model.extend({
       if (href[0] === '/') {
         href = '/v1' + href;
       } else {
-        href = '/v1' + this.currentFolder() + href;
+        href = '/v1/' + this.get('folder') + href;
       }
       return '<div class="image"><img src="' + href + '" title="' + (title || '') + '" class="img-thumbnail" /></div>';
     };
@@ -33,7 +33,7 @@ export default DS.Model.extend({
     // Make all links absolute
     this.markdownRenderer.link = (href, title, text) => {
       if (href.search(/http/) !== 0 && href[0] !== '/') {
-        href = this.currentFolder() + href;
+        href = this.get('folder') + href;
       }
       return '<a href="' + href + '">' + text + '</a>';
     };
@@ -87,8 +87,4 @@ export default DS.Model.extend({
 
     return compiled;
   }),
-
-  currentFolder: function () {
-    return "/" + this.id.slice(0, this.id.lastIndexOf('/')+1);
-  },
 });
