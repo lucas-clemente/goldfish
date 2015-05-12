@@ -45,6 +45,7 @@ func main() {
 	fmt.Printf("🐟 Goldfish listening on http://localhost:%d\n", port)
 
 	http.Handle("/v1/", server.NewHandler(repo, "/v1"))
+	http.Handle("/v2/", server.NewHandler2(repo))
 	http.Handle("/assets/", http.FileServer(&assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir}))
 	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		index, err := Asset("index.html")
