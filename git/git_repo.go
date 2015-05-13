@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	git2go "github.com/lucas-clemente/git2go"
+	git2go "github.com/libgit2/git2go"
 	"github.com/lucas-clemente/treewatch"
 )
 
@@ -122,6 +122,10 @@ func (r *GitRepo) StoreFile(p string, data io.Reader) error {
 
 // ListFiles lists the files in a given directory
 func (r *GitRepo) ListFiles(prefix string) ([]string, error) {
+	if prefix[len(prefix)-1] != '/' {
+		prefix += "/"
+	}
+
 	fileInfos, err := ioutil.ReadDir(r.absolutePath(prefix))
 	if err != nil {
 		return nil, err
