@@ -50,10 +50,12 @@ export default DS.Model.extend({
     this.markdownRenderer = new marked.Renderer();
 
     this.markdownRenderer.image = (href, title) => {
-      if (href[0] === '/') {
-        href = '/v2/raw' + href;
-      } else {
-        href = '/v2/raw' + this.get('folderPath') + "/" + href;
+      if (href.search(/http/) !== 0) {
+        if (href[0] === '/') {
+          href = '/v2/raw' + href;
+        } else {
+          href = '/v2/raw' + this.get('folderPath') + "/" + href;
+        }
       }
       return '<div class="image"><img src="' + href + '" title="' + (title || '') + '" class="img-thumbnail" /></div>';
     };
