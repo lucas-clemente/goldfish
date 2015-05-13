@@ -106,4 +106,13 @@ var _ = Describe("Handler", func() {
 		Expect(resp.Code).To(Equal(http.StatusOK))
 		Expect(resp.Body.String()).To(MatchJSON(`{"folder":{"id":"/","pages":["/baz"],"subfolders":["/foo"]}}`))
 	})
+
+	It("GETs pages", func() {
+		handler := server.NewHandler2(repo)
+		req, err := http.NewRequest("GET", "/v2/pages/baz", nil)
+		Expect(err).To(BeNil())
+		handler.ServeHTTP(resp, req)
+		Expect(resp.Code).To(Equal(http.StatusOK))
+		Expect(resp.Body.String()).To(MatchJSON(`{"page":{"id":"/baz"}}`))
+	})
 })

@@ -64,6 +64,30 @@ func NewHandler2(repo Repo) http.Handler {
 		}
 	})
 
+	router.GET("/v2/pages/*id", func(w http.ResponseWriter, _ *http.Request, p httprouter.Params) {
+		id := p.ByName("id")
+
+		c, err := repo.ReadFile(id)
+		if err != nil {
+			if os.IsNotExist(err) {
+				http.NotFound(w, nil)
+			} else {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+			return
+		}
+		c.Close()
+
+		err = json.NewEncoder(w).Encode(map[string]interface{}{
+			"page": map[string]interface{}{
+				"id": id,
+			},
+		})
+		if err != nil {
+			log.Println(err)
+		}
+	})
+
 	return router
 }
 
