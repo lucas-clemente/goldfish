@@ -24,14 +24,16 @@ export default DS.Model.extend({
     }
   }),
 
-  text: Ember.computed(function (k, v) {
-    if (arguments.length > 1) {
+  text: Ember.computed({
+    get: function () {
+      var url = '/v2/raw' + this.id.replace(/\|/g, '/');
+      Ember.$.get(url).then((val) => {
+        this.set('text', val);
+      });
+    },
+    set: function (k, v) {
       return v;
     }
-    var url = '/v2/raw' + this.id.replace(/\|/g, '/');
-    Ember.$.get(url).then((val) => {
-      this.set('text', val);
-    });
   }),
 
   // Either the top level heading or the filename

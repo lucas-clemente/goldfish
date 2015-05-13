@@ -9,13 +9,13 @@
           <i class="fa fa-chevron-left"></i> Back to {{model.parentFolder.name}}
         {{/link-to}}
       {{/if}}
-      {{#each subfolder in model.subfolders}}
+      {{#each model.subfolders as |subfolder|}}
         {{#link-to 'folder' subfolder.id class="list-group-item nav-item-folder"}}
           <i class="fa fa-folder-o"></i>
           {{subfolder.name}}
         {{/link-to}}
       {{/each}}
-      {{#each page in model.pages}}
+      {{#each model.pages as |page|}}
         {{#link-to 'page' page class="list-group-item nav-item-file"}}
           <i class="fa fa-{{page.icon}}"></i>
           {{page.name}}
