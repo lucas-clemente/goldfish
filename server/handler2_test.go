@@ -82,37 +82,37 @@ var _ = Describe("Handler", func() {
 
 	It("GETs folders", func() {
 		handler := server.NewHandler2(repo)
-		req, err := http.NewRequest("GET", "/v2/folders/foo", nil)
+		req, err := http.NewRequest("GET", "/v2/folders/|foo", nil)
 		Expect(err).To(BeNil())
 		handler.ServeHTTP(resp, req)
 		Expect(resp.Code).To(Equal(http.StatusOK))
-		Expect(resp.Body.String()).To(MatchJSON(`{"folder":{"id":"/foo","pages":["/foo/bar.md"],"subfolders":["/foo/fuu"]}}`))
+		Expect(resp.Body.String()).To(MatchJSON(`{"folder":{"id":"|foo","pages":["|foo|bar.md"],"subfolders":["|foo|fuu"],"parentFolder":"|"}}`))
 	})
 
 	It("GETs nested folders", func() {
 		handler := server.NewHandler2(repo)
-		req, err := http.NewRequest("GET", "/v2/folders/foo%2Ffuu", nil)
+		req, err := http.NewRequest("GET", "/v2/folders/|foo|fuu", nil)
 		Expect(err).To(BeNil())
 		handler.ServeHTTP(resp, req)
 		Expect(resp.Code).To(Equal(http.StatusOK))
-		Expect(resp.Body.String()).To(MatchJSON(`{"folder":{"id":"/foo/fuu","pages":["/foo/fuu/bar.md"],"subfolders":[]}}`))
+		Expect(resp.Body.String()).To(MatchJSON(`{"folder":{"id":"|foo|fuu","pages":["|foo|fuu|bar.md"],"subfolders":[],"parentFolder":"|foo"}}`))
 	})
 
 	It("GETs root folder", func() {
 		handler := server.NewHandler2(repo)
-		req, err := http.NewRequest("GET", "/v2/folders/", nil)
+		req, err := http.NewRequest("GET", "/v2/folders/|", nil)
 		Expect(err).To(BeNil())
 		handler.ServeHTTP(resp, req)
 		Expect(resp.Code).To(Equal(http.StatusOK))
-		Expect(resp.Body.String()).To(MatchJSON(`{"folder":{"id":"/","pages":["/baz"],"subfolders":["/foo"]}}`))
+		Expect(resp.Body.String()).To(MatchJSON(`{"folder":{"id":"|","pages":["|baz"],"subfolders":["|foo"],"parentFolder":null}}`))
 	})
 
 	It("GETs pages", func() {
 		handler := server.NewHandler2(repo)
-		req, err := http.NewRequest("GET", "/v2/pages/baz", nil)
+		req, err := http.NewRequest("GET", "/v2/pages/|baz", nil)
 		Expect(err).To(BeNil())
 		handler.ServeHTTP(resp, req)
 		Expect(resp.Code).To(Equal(http.StatusOK))
-		Expect(resp.Body.String()).To(MatchJSON(`{"page":{"id":"/baz"}}`))
+		Expect(resp.Body.String()).To(MatchJSON(`{"page":{"id":"|baz"}}`))
 	})
 })
