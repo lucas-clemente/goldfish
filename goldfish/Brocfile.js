@@ -25,6 +25,7 @@ var fontDir = {
 };
 
 app.import('bower_components/fontawesome/fonts/fontawesome-webfont.woff', fontDir);
+app.import('bower_components/fontawesome/fonts/fontawesome-webfont.woff2', fontDir);
 
 app.import('bower_components/highlightjs/highlight.pack.js');
 app.import('bower_components/highlightjs/styles/tomorrow.css');
@@ -34,7 +35,7 @@ app.import('bower_components/marked/lib/marked.js');
 app.import('bower_components/katex-build/katex.min.js');
 app.import('bower_components/katex-build/katex.min.css');
 
-var fontFiles = glob.sync('bower_components/katex-build/fonts/*.woff');
+var fontFiles = glob.sync('bower_components/katex-build/fonts/*.woff?(2)');
 for (var i = 0; i < fontFiles.length; i++) {
   app.import(fontFiles[i], fontDir);
 }
