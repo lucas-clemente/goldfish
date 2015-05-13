@@ -88,9 +88,15 @@ func NewHandler2(repo Repo) http.Handler {
 		}
 		c.Close()
 
+		folder := id[0:strings.LastIndex(id, "|")]
+		if folder == "" {
+			folder = "|"
+		}
+
 		err = json.NewEncoder(w).Encode(map[string]interface{}{
 			"page": map[string]interface{}{
-				"id": id,
+				"id":     id,
+				"folder": folder,
 			},
 		})
 		if err != nil {

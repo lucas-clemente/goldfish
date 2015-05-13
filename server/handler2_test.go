@@ -113,6 +113,6 @@ var _ = Describe("Handler", func() {
 		Expect(err).To(BeNil())
 		handler.ServeHTTP(resp, req)
 		Expect(resp.Code).To(Equal(http.StatusOK))
-		Expect(resp.Body.String()).To(MatchJSON(`{"page":{"id":"|baz"}}`))
+		Expect(resp.Body.String()).To(MatchJSON(`{"page":{"id":"|baz","folder":"|"}}`))
 	})
 })
