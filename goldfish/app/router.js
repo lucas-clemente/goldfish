@@ -2,9 +2,11 @@ import Ember from 'ember';
 import config from './config/environment';
 
 var Router = Ember.Router.extend({
-  location: config.locationType
+  location: config.locationType,
 });
 
 export default Router.map(function() {
-  this.resource('page', {path: '/*path'});
+  this.resource('folder', {path: '/folders/:folder_id'}, function () {
+    this.resource('page', {path: '/pages/:page_id'});
+  });
 });

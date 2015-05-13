@@ -2,10 +2,37 @@ import Ember from 'ember';
 import DS from 'ember-data';
 
 export default DS.Model.extend({
-  folder: DS.attr('string'),
-  text: DS.attr('string'),
+  folder: DS.belongsTo('folder', {async: true}),
 
   markdownRenderer: null,
+
+  name: Ember.computed('id', function () {
+    return this.id.slice(this.id.lastIndexOf('|') + 1);
+  }),
+
+  icon: Ember.computed('name', function () {
+    var name = this.get('name');
+    var extension = name.slice(name.lastIndexOf('.')+1);
+    switch (extension) {
+      case "md":
+        return "file-text-o";
+      case "png":
+      case "jpg":
+        return "file-image-o";
+      default:
+        return "file-o";
+    }
+  }),
+
+  text: Ember.computed(function (k, v) {
+    if (arguments.length > 1) {
+      return v;
+    }
+    var url = '/v2/raw' + this.id.replace(/\|/g, '/');
+    Ember.$.get(url).then((val) => {
+      this.set('text', val);
+    });
+  }),
 
   // Either the top level heading or the filename
   title: Ember.computed('id', 'text', function () {
@@ -13,8 +40,7 @@ export default DS.Model.extend({
     if (m) {
       return m[1].trim();
     }
-    var id = this.id;
-    return id.slice(id.lastIndexOf('/') + 1);
+    return this.get('name');
   }),
 
   init: function () {
@@ -23,17 +49,17 @@ export default DS.Model.extend({
 
     this.markdownRenderer.image = (href, title) => {
       if (href[0] === '/') {
-        href = '/v1' + href;
+        href = '/v2/raw' + href;
       } else {
-        href = '/v1/' + this.get('folder') + href;
+        href = '/v2/raw' + this.get('folder.path') + "/" + href;
       }
       return '<div class="image"><img src="' + href + '" title="' + (title || '') + '" class="img-thumbnail" /></div>';
     };
 
     // Make all links absolute
     this.markdownRenderer.link = (href, title, text) => {
-      if (href.search(/http/) !== 0 && href[0] !== '/') {
-        href = this.get('folder') + href;
+      if (href.search(/http/) !== 0) {
+        href = '/';
       }
       return '<a href="' + href + '">' + text + '</a>';
     };

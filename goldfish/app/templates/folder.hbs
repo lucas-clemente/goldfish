@@ -1,0 +1,29 @@
+<div class="row">
+  <div class="col-md-3">
+    <div class="list-group nav-list">
+      <div class="list-group-item nav-item-current-path">
+        {{model.path}}
+      </div>
+      {{#if model.parentFolder}}
+        {{#link-to 'folder' model.parentFolder.id class="list-group-item nav-item-back"}}
+          <i class="fa fa-chevron-left"></i> Back to {{model.parentFolder.name}}
+        {{/link-to}}
+      {{/if}}
+      {{#each subfolder in model.subfolders}}
+        {{#link-to 'folder' subfolder.id class="list-group-item nav-item-folder"}}
+          <i class="fa fa-folder-o"></i>
+          {{subfolder.name}}
+        {{/link-to}}
+      {{/each}}
+      {{#each page in model.pages}}
+        {{#link-to 'page' page class="list-group-item nav-item-file"}}
+          <i class="fa fa-{{page.icon}}"></i>
+          {{page.name}}
+        {{/link-to}}
+      {{/each}}
+    </div>
+  </div>
+  <div class="col-md-9">
+    {{outlet}}
+  </div>
+</div>

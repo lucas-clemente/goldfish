@@ -18,6 +18,30 @@ $fa-font-path: "/assets/fonts";
 }
 
 
+// Folder list
+
+.nav-list {
+  .nav-item-current-path {
+    font-family: $font-family-monospace;
+    font-size: 12px;
+    color: lighten($text-color, 30%);
+  }
+
+  .nav-item-file,
+  .nav-item-folder {
+    i {
+      margin-right: 8px;
+    }
+  }
+
+  a.list-group-item:active {
+    background-color: lighten(#428bca, 20%);
+    border-color: lighten(#428bca, 20%);
+    color: #fff;
+  }
+}
+
+
 // Page
 
 .page-contents {
