@@ -53,7 +53,7 @@ export default DS.Model.extend({
       if (href[0] === '/') {
         href = '/v2/raw' + href;
       } else {
-        href = '/v2/raw' + this.get('folder.path') + "/" + href;
+        href = '/v2/raw' + this.get('folderPath') + "/" + href;
       }
       return '<div class="image"><img src="' + href + '" title="' + (title || '') + '" class="img-thumbnail" /></div>';
     };
@@ -61,7 +61,13 @@ export default DS.Model.extend({
     // Make all links absolute
     this.markdownRenderer.link = (href, title, text) => {
       if (href.search(/http/) !== 0) {
-        href = '/';
+        if (href[0] !== '/') {
+          // Make link absolute
+          href = this.get('folderPath') + '/' + href;
+          href = href.replace('//', '/');
+        }
+        var refFolder = href.slice(0, href.lastIndexOf('/'));
+        href = `/folders/${ refFolder.replace(/\//g, '|') }/pages/${ href.replace(/\//g, '|') }`;
       }
       return '<a href="' + href + '">' + text + '</a>';
     };
@@ -115,4 +121,12 @@ export default DS.Model.extend({
 
     return compiled;
   }),
+
+  folderPath: Ember.computed('id', function () {
+    var folderID = this.id.slice(0, this.id.lastIndexOf('|'));
+    if (folderID === '') {
+      folderID = '|';
+    }
+    return folderID.replace(/\|/g, '/');
+  })
 });
