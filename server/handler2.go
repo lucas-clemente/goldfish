@@ -32,8 +32,8 @@ func NewHandler2(repo Repo) http.Handler {
 		}
 	})
 
-	router.GET("/v2/folders/:id", func(w http.ResponseWriter, _ *http.Request, p httprouter.Params) {
-		id := "/" + p.ByName("id")
+	router.GET("/v2/folders/*id", func(w http.ResponseWriter, _ *http.Request, p httprouter.Params) {
+		id := p.ByName("id")
 
 		entries, err := repo.ListFiles(id)
 		if err != nil {

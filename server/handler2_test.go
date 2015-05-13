@@ -7,8 +7,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"sort"
-	"strings"
 
 	"github.com/lucas-clemente/goldfish/server"
 
@@ -17,38 +15,33 @@ import (
 )
 
 type mockRepo2 struct {
-	files map[string]string
 }
 
 func (r *mockRepo2) ReadFile(path string) (io.ReadCloser, error) {
-	if c, ok := r.files[path]; ok {
+	files := map[string]string{
+		"/foo/bar.md":     "foobar",
+		"/foo/fuu/bar.md": "foobar",
+		"/baz":            "foobaz",
+	}
+
+	if c, ok := files[path]; ok {
 		return ioutil.NopCloser(bytes.NewBufferString(c)), nil
 	}
 	return nil, os.ErrNotExist
 }
 func (r *mockRepo2) StoreFile(path string, reader io.Reader) error {
-	c, err := ioutil.ReadAll(reader)
-	if err != nil {
-		return err
-	}
-	r.files[path] = string(c)
-	return nil
+	panic("not implemented")
 }
 
 func (r *mockRepo2) ListFiles(prefix string) ([]string, error) {
-	paths := []string{}
-	for p := range r.files {
-		if strings.HasPrefix(p, prefix) {
-			withoutPrefix := strings.TrimPrefix(p, prefix+"/")
-			if strings.Contains(withoutPrefix, "/") {
-				paths = append(paths, prefix+"/"+strings.Split(withoutPrefix, "/")[0]+"/")
-			} else {
-				paths = append(paths, p)
-			}
-		}
+	if prefix == "/" {
+		return []string{"/baz", "/foo/"}, nil
+	} else if prefix == "/foo" {
+		return []string{"/foo/bar.md", "/foo/fuu/"}, nil
+	} else if prefix == "/foo/fuu" {
+		return []string{"/foo/fuu/bar.md"}, nil
 	}
-	sort.Strings(paths)
-	return paths, nil
+	return nil, os.ErrNotExist
 }
 
 func (r *mockRepo2) Observer() <-chan string {
@@ -66,12 +59,7 @@ var _ = Describe("Handler", func() {
 	)
 
 	BeforeEach(func() {
-		files := map[string]string{
-			"/foo/bar.md":     "foobar",
-			"/foo/fuu/bar.md": "foobar",
-			"/baz":            "foobaz",
-		}
-		repo = &mockRepo2{files: files}
+		repo = &mockRepo2{}
 		resp = httptest.NewRecorder()
 	})
 
@@ -99,5 +87,23 @@ var _ = Describe("Handler", func() {
 		handler.ServeHTTP(resp, req)
 		Expect(resp.Code).To(Equal(http.StatusOK))
 		Expect(resp.Body.String()).To(MatchJSON(`{"folder":{"id":"/foo","pages":["/foo/bar.md"],"subfolders":["/foo/fuu"]}}`))
+	})
+
+	It("GETs nested folders", func() {
+		handler := server.NewHandler2(repo)
+		req, err := http.NewRequest("GET", "/v2/folders/foo%2Ffuu", nil)
+		Expect(err).To(BeNil())
+		handler.ServeHTTP(resp, req)
+		Expect(resp.Code).To(Equal(http.StatusOK))
+		Expect(resp.Body.String()).To(MatchJSON(`{"folder":{"id":"/foo/fuu","pages":["/foo/fuu/bar.md"],"subfolders":[]}}`))
+	})
+
+	It("GETs root folder", func() {
+		handler := server.NewHandler2(repo)
+		req, err := http.NewRequest("GET", "/v2/folders/", nil)
+		Expect(err).To(BeNil())
+		handler.ServeHTTP(resp, req)
+		Expect(resp.Code).To(Equal(http.StatusOK))
+		Expect(resp.Body.String()).To(MatchJSON(`{"folder":{"id":"/","pages":["/baz"],"subfolders":["/foo"]}}`))
 	})
 })
