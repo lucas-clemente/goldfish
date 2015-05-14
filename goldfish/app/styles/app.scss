@@ -61,6 +61,10 @@ $fa-font-path: "/assets/fonts";
 
 .page-image {
   text-align: center;
+  
+  img {
+    max-width: 100%;
+  }
 }
 
 
