@@ -9,4 +9,5 @@ export default Router.map(function() {
   this.resource('folder', {path: '/folders/:folder_id'}, function () {
     this.resource('page', {path: '/pages/:page_id'});
   });
+  this.route('not-found', {path: '/*path'});
 });
