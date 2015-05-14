@@ -18,6 +18,7 @@ export default DS.Model.extend({
         return "file-text-o";
       case "png":
       case "jpg":
+      case "svg":
         return "file-image-o";
       default:
         return "file-o";
@@ -111,7 +112,7 @@ export default DS.Model.extend({
     // Replace [[links]]
 
     // Images, e.g. [[foo.jpg]]
-    source = source.replace(/\[\[([^|\]]+\.(?:jpg|png))\]\]/g, "![$1]($1)");
+    source = source.replace(/\[\[([^|\]]+\.(?:jpg|png|svg))\]\]/g, "![$1]($1)");
     // [[foo.extension]]
     source = source.replace(/\[\[([^|\]]+)\.([^|\]\.]+)\]\]/g, "[$1]($1.$2)");
     // [[foo]]

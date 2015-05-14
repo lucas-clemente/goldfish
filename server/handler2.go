@@ -28,6 +28,9 @@ func NewHandler2(repo Repo) http.Handler {
 			return
 		}
 		defer c.Close()
+
+		w.Header().Set("Content-Type", getContentType(path))
+
 		if _, err := io.Copy(w, c); err != nil {
 			log.Println(err)
 		}
@@ -121,4 +124,17 @@ func idToPath(id string) string {
 
 func pathToID(path string) string {
 	return strings.Replace(path, "/", "|", -1)
+}
+
+func getContentType(filename string) string {
+	extension := filename[strings.LastIndex(filename, ".")+1:]
+	switch extension {
+	case "jpg":
+		return "image/jpeg"
+	case "png":
+		return "image/png"
+	case "svg":
+		return "image/svg+xml"
+	}
+	return "text/plain"
 }
