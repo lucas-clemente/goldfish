@@ -107,7 +107,6 @@ export default DS.Model.extend({
         }
       }
     });
-
   },
 
   markdownSource: Ember.computed('isMarkdown', {
@@ -123,6 +122,14 @@ export default DS.Model.extend({
       return v;
     }
   }),
+
+  saveMarkdown: function () {
+    var path = this.get('rawPath');
+    Ember.$.post(path, this.get('markdownSource'))
+    .fail(function () {
+      console.error('error saving to ', path);
+    });
+  },
 
   compiledMarkdown: Ember.computed('markdownSource', function () {
     var source = this.get('markdownSource');

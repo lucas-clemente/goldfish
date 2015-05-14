@@ -24,7 +24,7 @@ export default Ember.View.extend({
       });
 
       // Fix internal links
-      Ember.$(el).find('a').each((i, el) => {
+      Ember.$(el).find('.page-markdown a').each((i, el) => {
         var href = el.getAttribute('href');
         if (href[0] === '/') {
           Ember.$(el).click((ev) => {

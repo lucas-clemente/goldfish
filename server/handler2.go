@@ -36,6 +36,17 @@ func NewHandler2(repo Repo) http.Handler {
 		}
 	})
 
+	router.POST("/v2/raw/*path", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		path := p.ByName("path")
+
+		err := repo.StoreFile(path, r.Body)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusNoContent)
+	})
+
 	router.GET("/v2/folders/*id", func(w http.ResponseWriter, _ *http.Request, p httprouter.Params) {
 		id := strings.TrimLeft(p.ByName("id"), "/")
 

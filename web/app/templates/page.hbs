@@ -1,3 +1,21 @@
+{{#if model.isMarkdown}}
+  {{#if isEditing}}
+    <div class="btn-group pull-right">
+      <a class="btn btn-default" {{action "discardChanges"}}>
+        <i class="fa fa-times"></i> Discard
+      </a>
+      <a class="btn btn-success" {{action "saveChanges"}}>
+        <i class="fa fa-check"></i> Save
+      </a>
+    </div>
+  {{else}}
+    <a class="btn btn-default pull-right" {{action "startEditing"}}>
+      <i class="fa fa-pencil"></i> Edit
+    </a>
+  {{/if}}
+{{/if}}
+
+
 <div class="page-header">
   <h1>
     {{model.title}}
@@ -6,9 +24,13 @@
 </div>
 
 {{#if model.isMarkdown}}
-  <div class="page-markdown">
-    {{{model.compiledMarkdown}}}
-  </div>
+  {{#if isEditing}}
+    {{textarea value=model.markdownSource class="markdown-edit"}}
+  {{else}}
+    <div class="page-markdown">
+      {{{model.compiledMarkdown}}}
+    </div>
+  {{/if}}
 {{else if model.isImage}}
   <div class="page-image">
     <img src="{{model.rawPath}}">

@@ -15,6 +15,7 @@ import (
 )
 
 type mockRepo2 struct {
+	storedData map[string]string
 }
 
 func (r *mockRepo2) ReadFile(path string) (io.ReadCloser, error) {
@@ -30,7 +31,12 @@ func (r *mockRepo2) ReadFile(path string) (io.ReadCloser, error) {
 	return nil, os.ErrNotExist
 }
 func (r *mockRepo2) StoreFile(path string, reader io.Reader) error {
-	panic("not implemented")
+	data, err := ioutil.ReadAll(reader)
+	if err != nil {
+		return err
+	}
+	r.storedData[path] = string(data)
+	return nil
 }
 
 func (r *mockRepo2) ListFiles(prefix string) ([]string, error) {
@@ -59,7 +65,9 @@ var _ = Describe("Handler", func() {
 	)
 
 	BeforeEach(func() {
-		repo = &mockRepo2{}
+		repo = &mockRepo2{
+			storedData: map[string]string{},
+		}
 		resp = httptest.NewRecorder()
 	})
 
@@ -70,6 +78,16 @@ var _ = Describe("Handler", func() {
 		handler.ServeHTTP(resp, req)
 		Expect(resp.Code).To(Equal(http.StatusOK))
 		Expect(resp.Body.String()).To(Equal("foobar"))
+	})
+
+	It("POSTs raw", func() {
+		handler := server.NewHandler2(repo)
+		body := bytes.NewBufferString("new content")
+		req, err := http.NewRequest("POST", "/v2/raw/baz", body)
+		Expect(err).To(BeNil())
+		handler.ServeHTTP(resp, req)
+		Expect(resp.Code).To(Equal(http.StatusNoContent))
+		Expect(repo.storedData["/baz"]).To(Equal("new content"))
 	})
 
 	It("404s", func() {
