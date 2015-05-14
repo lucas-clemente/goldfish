@@ -17,6 +17,10 @@ export default DS.Model.extend({
     return this.id.slice(this.id.lastIndexOf('.')+1);
   }),
 
+  rawPath: Ember.computed('id', function () {
+    return '/v2/raw' + this.id.replace(/\|/g, '/');
+  }),
+
   icon: Ember.computed('extension', function () {
     switch (this.get('extension')) {
       case "md":
@@ -48,6 +52,14 @@ export default DS.Model.extend({
     return this.get('name');
   }),
 
+  // --------------------------------------------------------------------------
+  // -- Image specific --------------------------------------------------------
+  // --------------------------------------------------------------------------
+
+  isImage: Ember.computed('extension', function () {
+    var ext = this.get('extension');
+    return ext === 'jpg' || ext === 'png' || ext === 'svg';
+  }),
 
   // --------------------------------------------------------------------------
   // -- Markdown specific -----------------------------------------------------
@@ -100,8 +112,7 @@ export default DS.Model.extend({
 
   markdownSource: Ember.computed({
     get: function () {
-      var url = '/v2/raw' + this.id.replace(/\|/g, '/');
-      Ember.$.get(url).then((val) => {
+      Ember.$.get(this.get('rawPath')).then((val) => {
         this.set('markdownSource', val);
       });
     },

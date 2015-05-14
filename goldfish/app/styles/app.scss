@@ -44,7 +44,7 @@ $fa-font-path: "/assets/fonts";
 
 // Page
 
-.page-contents {
+.page-markdown {
   font-size: $font-size-page;
   .image {
     text-align: center;
@@ -58,6 +58,27 @@ $fa-font-path: "/assets/fonts";
   }
 }
 
+
+.page-image {
+  text-align: center;
+}
+
+
+.page-unsupported,
+.page-notfound {
+  text-align: center;
+
+  img {
+    margin-top: 50px;
+    margin-bottom: 50px;
+    height: auto;
+    max-width: 60%;
+  }
+
+  p {
+    font-size: 18px;
+  }
+}
 
 // Footer
 

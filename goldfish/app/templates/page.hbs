@@ -6,7 +6,18 @@
 </div>
 
 {{#if model.isMarkdown}}
-  <div class="page-contents">
+  <div class="page-markdown">
     {{{model.compiledMarkdown}}}
+  </div>
+{{else if model.isImage}}
+  <div class="page-image">
+    <img src="{{model.rawPath}}">
+  </div>
+{{else}}
+  <div class="page-unsupported">
+    <img src="/assets/confused_fish.svg" alt="">
+    <p>
+      Goldfish can't remember how to display this file :S
+    </p>
   </div>
 {{/if}}
