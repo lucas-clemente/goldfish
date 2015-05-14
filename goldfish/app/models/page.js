@@ -73,6 +73,16 @@ export default DS.Model.extend({
       }
       return '<a href="' + href + '">' + text + '</a>';
     };
+
+    marked.setOptions({
+      highlight: function (code, lang) {
+        if (lang) {
+          return hljs.highlight(lang, code).value;
+        } else {
+          return hljs.highlightAuto(code).value;
+        }
+      }
+    });
   },
 
   compiled: Ember.computed('text', function () {

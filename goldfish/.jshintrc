@@ -4,6 +4,7 @@
     "window",
     "-Promise",
     "marked",
+    "hljs",
     "katex"
   ],
   "browser": true,
