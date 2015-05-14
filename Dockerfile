@@ -8,8 +8,8 @@ RUN apt-get update && apt-get install -y \
   && rm -rf /var/lib/apt/lists/*
 
 # git2go
-RUN go get github.com/libgit2/git2go || true
-RUN cd /go/src/github.com/libgit2/git2go && git submodule update --init && make -j4 install
+RUN go get -d github.com/libgit2/git2go
+RUN cd $GOPATH/src/github.com/libgit2/git2go && git checkout next && git submodule update --init && make -j5 install
 
 # For tests
 RUN go get github.com/onsi/ginkgo/ginkgo github.com/onsi/gomega
