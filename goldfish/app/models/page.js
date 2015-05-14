@@ -110,8 +110,11 @@ export default DS.Model.extend({
 
   },
 
-  markdownSource: Ember.computed({
+  markdownSource: Ember.computed('isMarkdown', {
     get: function () {
+      if (!this.get('isMarkdown')) {
+        return "";
+      }
       Ember.$.get(this.get('rawPath')).then((val) => {
         this.set('markdownSource', val);
       });
@@ -122,7 +125,10 @@ export default DS.Model.extend({
   }),
 
   compiledMarkdown: Ember.computed('markdownSource', function () {
-    var source = this.get('markdownSource') || "";
+    var source = this.get('markdownSource');
+    if (!source) {
+      return "";
+    }
 
     // Remove top level heading
     source = source.replace(/^#(.*)/, "");
