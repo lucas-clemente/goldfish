@@ -5,15 +5,12 @@ export default Ember.View.extend({
     this.updateDomStuff();
   },
 
-  updateDomStuff: Ember.observer('controller.model.compiled', function () {
+  updateDomStuff: Ember.observer('controller.model.compiledMarkdown', function () {
     Ember.run.scheduleOnce('afterRender', this, function() {
-      // This is a workaround for #37.
-      // For some reason this.$ is sometimes undefined.
       var el = this.get('element');
       if (!el) {
         return;
       }
-
       // Render tex
       Ember.$(el).find('script').each(function (i, e) {
         var t = e.getAttribute('type');
