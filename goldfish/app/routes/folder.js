@@ -8,4 +8,10 @@ export default Ember.Route.extend({
   model: function (params) {
     return this.store.find('folder', params.folder_id);
   },
+
+  actions: {
+    error: function () {
+      this.transitionTo('/not-found');
+    },
+  },
 });
