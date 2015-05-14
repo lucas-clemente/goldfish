@@ -4,16 +4,21 @@ import DS from 'ember-data';
 export default DS.Model.extend({
   folder: DS.belongsTo('folder', {async: true}),
 
-  markdownRenderer: null,
+  init: function () {
+    this._super.apply(this, arguments);
+    this.initMarkdownRenderer();
+  },
 
   name: Ember.computed('id', function () {
     return this.id.slice(this.id.lastIndexOf('|') + 1);
   }),
 
-  icon: Ember.computed('name', function () {
-    var name = this.get('name');
-    var extension = name.slice(name.lastIndexOf('.')+1);
-    switch (extension) {
+  extension: Ember.computed('id', function () {
+    return this.id.slice(this.id.lastIndexOf('.')+1);
+  }),
+
+  icon: Ember.computed('extension', function () {
+    switch (this.get('extension')) {
       case "md":
         return "file-text-o";
       case "png":
@@ -25,29 +30,35 @@ export default DS.Model.extend({
     }
   }),
 
-  text: Ember.computed({
-    get: function () {
-      var url = '/v2/raw' + this.id.replace(/\|/g, '/');
-      Ember.$.get(url).then((val) => {
-        this.set('text', val);
-      });
-    },
-    set: function (k, v) {
-      return v;
+  folderPath: Ember.computed('id', function () {
+    var folderID = this.id.slice(0, this.id.lastIndexOf('|'));
+    if (folderID === '') {
+      folderID = '|';
     }
+    return folderID.replace(/\|/g, '/');
   }),
 
+
   // Either the top level heading or the filename
-  title: Ember.computed('id', 'text', function () {
-    var m = /^#(.*)\n/.exec(this.get('text'));
+  title: Ember.computed('id', 'markdownSource', function () {
+    var m = /^#(.*)\n/.exec(this.get('markdownSource'));
     if (m) {
       return m[1].trim();
     }
     return this.get('name');
   }),
 
-  init: function () {
-    this._super.apply(this, arguments);
+
+  // --------------------------------------------------------------------------
+  // -- Markdown specific -----------------------------------------------------
+  // --------------------------------------------------------------------------
+
+  isMarkdown: Ember.computed('extension', function () {
+    var ext = this.get('extension');
+    return ext === 'md' || ext === 'markdown';
+  }),
+
+  initMarkdownRenderer: function () {
     this.markdownRenderer = new marked.Renderer();
 
     this.markdownRenderer.image = (href, title) => {
@@ -84,10 +95,23 @@ export default DS.Model.extend({
         }
       }
     });
+
   },
 
-  compiled: Ember.computed('text', function () {
-    var source = this.get('text') || "";
+  markdownSource: Ember.computed({
+    get: function () {
+      var url = '/v2/raw' + this.id.replace(/\|/g, '/');
+      Ember.$.get(url).then((val) => {
+        this.set('markdownSource', val);
+      });
+    },
+    set: function (k, v) {
+      return v;
+    }
+  }),
+
+  compiledMarkdown: Ember.computed('markdownSource', function () {
+    var source = this.get('markdownSource') || "";
 
     // Remove top level heading
     source = source.replace(/^#(.*)/, "");
@@ -134,12 +158,4 @@ export default DS.Model.extend({
 
     return compiled;
   }),
-
-  folderPath: Ember.computed('id', function () {
-    var folderID = this.id.slice(0, this.id.lastIndexOf('|'));
-    if (folderID === '') {
-      folderID = '|';
-    }
-    return folderID.replace(/\|/g, '/');
-  })
 });

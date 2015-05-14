@@ -4,6 +4,8 @@
   </h1>
 </div>
 
-<div class="page-contents">
-  {{{model.compiled}}}
-</div>
+{{#if model.isMarkdown}}
+  <div class="page-contents">
+    {{{model.compiledMarkdown}}}
+  </div>
+{{/if}}
