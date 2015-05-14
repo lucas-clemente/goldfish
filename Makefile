@@ -15,10 +15,10 @@ debug:
 
 web:
 	rm -rf web/dist
-	cd web && ENV=production gulp
+	cd web && ember build --environment=production
 
 bindata: web
-	go-bindata -prefix=web/dist web/dist/...
+	go-bindata -nomemcopy=true -prefix=web/dist web/dist/...
 
 build: bindata
 	go build -o build/goldfish_$(GOOS)
