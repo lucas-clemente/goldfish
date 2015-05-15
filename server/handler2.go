@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -100,17 +101,28 @@ func NewHandler2(repo Repo) http.Handler {
 			}
 			return
 		}
-		c.Close()
+		defer c.Close()
 
 		folder := id[0:strings.LastIndex(id, "|")]
 		if folder == "" {
 			folder = "|"
 		}
 
+		var markdownSource interface{}
+		if strings.HasSuffix(id, ".md") {
+			markdownSourceBytes, err := ioutil.ReadAll(c)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			markdownSource = string(markdownSourceBytes)
+		}
+
 		err = json.NewEncoder(w).Encode(map[string]interface{}{
 			"page": map[string]interface{}{
-				"id":     id,
-				"folder": folder,
+				"id":             id,
+				"folder":         folder,
+				"markdownSource": markdownSource,
 			},
 		})
 		if err != nil {

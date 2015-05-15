@@ -2,6 +2,7 @@ import Ember from 'ember';
 import DS from 'ember-data';
 
 export default DS.Model.extend({
+  markdownSource: DS.attr('string'),
   folder: DS.belongsTo('folder', {async: true}),
 
   init: function () {
@@ -108,20 +109,6 @@ export default DS.Model.extend({
       }
     });
   },
-
-  markdownSource: Ember.computed('isMarkdown', {
-    get: function () {
-      if (!this.get('isMarkdown')) {
-        return "";
-      }
-      Ember.$.get(this.get('rawPath')).then((val) => {
-        this.set('markdownSource', val);
-      });
-    },
-    set: function (k, v) {
-      return v;
-    }
-  }),
 
   saveMarkdown: function () {
     var path = this.get('rawPath');

@@ -131,6 +131,15 @@ var _ = Describe("Handler", func() {
 		Expect(err).To(BeNil())
 		handler.ServeHTTP(resp, req)
 		Expect(resp.Code).To(Equal(http.StatusOK))
-		Expect(resp.Body.String()).To(MatchJSON(`{"page":{"id":"|baz","folder":"|"}}`))
+		Expect(resp.Body.String()).To(MatchJSON(`{"page":{"id":"|baz","folder":"|","markdownSource":null}}`))
+	})
+
+	It("GETs markdown pages", func() {
+		handler := server.NewHandler2(repo)
+		req, err := http.NewRequest("GET", "/v2/pages/|foo|bar.md", nil)
+		Expect(err).To(BeNil())
+		handler.ServeHTTP(resp, req)
+		Expect(resp.Code).To(Equal(http.StatusOK))
+		Expect(resp.Body.String()).To(MatchJSON(`{"page":{"id":"|foo|bar.md","folder":"|foo","markdownSource":"foobar"}}`))
 	})
 })
