@@ -92,39 +92,42 @@ func NewHandler2(repo Repo) http.Handler {
 	router.GET("/v2/pages/*id", func(w http.ResponseWriter, _ *http.Request, p httprouter.Params) {
 		id := strings.TrimLeft(p.ByName("id"), "/")
 
-		c, err := repo.ReadFile(idToPath(id))
+		jsonPage, err := getPageJSON(repo, id)
 		if err != nil {
-			if os.IsNotExist(err) {
-				http.NotFound(w, nil)
-			} else {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-			}
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		defer c.Close()
 
-		folder := id[0:strings.LastIndex(id, "|")]
-		if folder == "" {
-			folder = "|"
+		err = json.NewEncoder(w).Encode(map[string]interface{}{"page": jsonPage})
+		if err != nil {
+			log.Println(err)
+		}
+	})
+
+	router.GET("/v2/pages", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		var searchTerm string
+		searchTermList, ok := r.URL.Query()["q"]
+		if ok && len(searchTermList) != 0 {
+			searchTerm = searchTermList[0]
 		}
 
-		var markdownSource interface{}
-		if strings.HasSuffix(id, ".md") {
-			markdownSourceBytes, err := ioutil.ReadAll(c)
+		results, err := repo.SearchFiles(searchTerm)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		var jsonArray []interface{}
+		for _, path := range results {
+			jsonPage, err := getPageJSON(repo, pathToID(path))
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			markdownSource = string(markdownSourceBytes)
+			jsonArray = append(jsonArray, jsonPage)
 		}
 
-		err = json.NewEncoder(w).Encode(map[string]interface{}{
-			"page": map[string]interface{}{
-				"id":             id,
-				"folder":         folder,
-				"markdownSource": markdownSource,
-			},
-		})
+		err = json.NewEncoder(w).Encode(map[string]interface{}{"pages": jsonArray})
 		if err != nil {
 			log.Println(err)
 		}
@@ -160,4 +163,32 @@ func getContentType(filename string) string {
 		return "image/svg+xml"
 	}
 	return "text/plain"
+}
+
+func getPageJSON(repo Repo, id string) (interface{}, error) {
+	c, err := repo.ReadFile(idToPath(id))
+	if err != nil {
+		return nil, err
+	}
+	defer c.Close()
+
+	folder := id[0:strings.LastIndex(id, "|")]
+	if folder == "" {
+		folder = "|"
+	}
+
+	var markdownSource interface{}
+	if strings.HasSuffix(id, ".md") {
+		markdownSourceBytes, err := ioutil.ReadAll(c)
+		if err != nil {
+			return nil, err
+		}
+		markdownSource = string(markdownSourceBytes)
+	}
+
+	return (map[string]interface{}{
+		"id":             id,
+		"folder":         folder,
+		"markdownSource": markdownSource,
+	}), nil
 }

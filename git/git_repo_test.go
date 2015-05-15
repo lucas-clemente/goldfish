@@ -127,5 +127,24 @@ var _ = Describe("Repo", func() {
 			Expect(reader).To(BeNil())
 			Expect(os.IsNotExist(err)).To(BeTrue())
 		})
+
+		It("finds files", func() {
+			err := repo.StoreFile("/foo/Home.md", bytes.NewBufferString("foobar"))
+			Expect(err).To(BeNil())
+			err = repo.StoreFile("/foo/NotHome.md", bytes.NewBufferString("foobaz"))
+			Expect(err).To(BeNil())
+
+			matches, err := repo.SearchFiles("foobar")
+			Expect(err).To(BeNil())
+			Expect(matches).To(Equal([]string{"/foo/Home.md"}))
+
+			matches, err = repo.SearchFiles("fooba")
+			Expect(err).To(BeNil())
+			Expect(matches).To(Equal([]string{"/foo/Home.md", "/foo/NotHome.md"}))
+
+			matches, err = repo.SearchFiles("")
+			Expect(err).To(BeNil())
+			Expect(matches).To(Equal([]string{"/foo/Home.md", "/foo/NotHome.md"}))
+		})
 	})
 })

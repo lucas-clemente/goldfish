@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -140,6 +141,32 @@ func (r *GitRepo) ListFiles(prefix string) ([]string, error) {
 	}
 
 	return files, nil
+}
+
+// SearchFiles looks for markdown files containing `term` and returns the paths.
+func (r *GitRepo) SearchFiles(term string) ([]string, error) {
+	// Walk through all files
+	matches := []string{}
+	err := filepath.Walk(r.path, func(path string, f os.FileInfo, err error) error {
+		if strings.Contains(path, "/.git/") || !strings.HasSuffix(path, ".md") {
+			return nil
+		}
+
+		b, err := ioutil.ReadFile(path)
+		if err != nil {
+			return err
+		}
+
+		if strings.Contains(string(b), term) {
+			matches = append(matches, strings.TrimPrefix(path, r.path))
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return matches, nil
 }
 
 // Observer sends file paths on changes

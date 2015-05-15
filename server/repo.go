@@ -7,6 +7,7 @@ type Repo interface {
 	ReadFile(path string) (io.ReadCloser, error)
 	StoreFile(path string, content io.Reader) error
 	ListFiles(prefix string) ([]string, error)
+	SearchFiles(term string) ([]string, error)
 
 	Observer() <-chan string
 	CloseObserver(<-chan string)
