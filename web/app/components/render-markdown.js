@@ -1,18 +1,16 @@
 import Ember from 'ember';
 
-export default Ember.View.extend({
+export default Ember.Component.extend({
+  compiledMarkdown: '',
+
   didInsertElement: function () {
     this.updateDomStuff();
   },
 
-  updateDomStuff: Ember.observer('controller.model.compiledMarkdown', function () {
+  updateDomStuff: Ember.observer('compiledMarkdown', function () {
     Ember.run.scheduleOnce('afterRender', this, function() {
-      var el = this.get('element');
-      if (!el) {
-        return;
-      }
       // Render tex
-      Ember.$(el).find('script').each(function (i, e) {
+      this.$('script').each(function (i, e) {
         var t = e.getAttribute('type');
         if (t.search('math/tex') === 0) {
           katex.render(e.textContent,
@@ -24,11 +22,11 @@ export default Ember.View.extend({
       });
 
       // Fix internal links
-      Ember.$(el).find('.page-markdown a').each((i, el) => {
+      this.$('a').each((i, el) => {
         var href = el.getAttribute('href');
         if (href[0] === '/') {
           Ember.$(el).click((ev) => {
-            var router = this.get('controller.target.router');
+            var router = this.container.lookup('router:main').router;
             router.transitionTo(href);
             ev.preventDefault();
           });

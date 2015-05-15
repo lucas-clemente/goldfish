@@ -31,7 +31,7 @@
     {{textarea-autosize value=model.markdownSource class="markdown-edit"}}
   {{else}}
     <div class="page-markdown">
-      {{{model.compiledMarkdown}}}
+      {{render-markdown compiledMarkdown=model.compiledMarkdown}}
     </div>
   {{/if}}
 {{else if model.isImage}}
