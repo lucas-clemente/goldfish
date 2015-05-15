@@ -16,6 +16,7 @@
     "marked": "~0.3.3",
     "fontawesome": "~4.3.0",
     "highlightjs": "~8.5.0",
-    "katex-build": "~0.3.0"
+    "katex-build": "~0.3.0",
+    "autosize": "~3.0.4"
   }
 }

@@ -87,13 +87,13 @@ $fa-font-path: "/assets/fonts";
 .markdown-edit {
   width: 100%;
   padding: 1em;
-  height: 80vh;
 
   font-size: $font-size-page * 1.2;
   font-family: $font-family-monospace;
 
   border: none;
   outline: 0;
+  resize: none;
 }
 
 // Footer

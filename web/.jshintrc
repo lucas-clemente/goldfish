@@ -5,7 +5,8 @@
     "-Promise",
     "marked",
     "hljs",
-    "katex"
+    "katex",
+    "autosize"
   ],
   "browser": true,
   "boss": true,
