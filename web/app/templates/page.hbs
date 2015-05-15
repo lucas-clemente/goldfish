@@ -18,6 +18,9 @@
 
 <div class="page-header">
   <h1>
+    {{#if isEditing}}
+      Editing
+    {{/if}}
     {{model.title}}
     <small>{{model.folderPath}}</small>
   </h1>
