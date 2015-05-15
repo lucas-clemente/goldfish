@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"path"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -24,11 +23,6 @@ type GitRepo struct {
 
 // NewGitRepo opens or makes a git repo at the given path
 func NewGitRepo(repoPath string) (*GitRepo, error) {
-	repoPath, err := filepath.EvalSymlinks(repoPath)
-	if err != nil {
-		return nil, err
-	}
-
 	repo, err := git2go.OpenRepository(repoPath)
 	if err != nil {
 		repo, err = git2go.InitRepository(repoPath, false)

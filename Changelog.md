@@ -1,5 +1,9 @@
 # Goldfish Changelog
 
+## 0.2.1 (unreleased)
+
+- Goldfish now automatically creates the data directory if it doesn't exist already
+
 ## 0.2.0 (2015-05-15)
 
 - Added a very basic markdown editor, to be expanded over the next versions

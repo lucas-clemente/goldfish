@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
 
@@ -28,6 +29,11 @@ func main() {
 	}
 
 	path := flag.Arg(0)
+
+	if err := os.MkdirAll(path, os.ModeDir|0755); err != nil {
+		log.Fatal(err)
+	}
+
 	path, err := filepath.EvalSymlinks(path)
 	if err != nil {
 		log.Fatal(err)

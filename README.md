@@ -27,11 +27,10 @@ If you're on linux, make sure to install either `libinotifytools` or `inotifytoo
 
 ```bash
 # Or whatever path suits you
-mkdir -p ~/goldfish
 ./goldfish ~/goldfish
 ```
 
-Then open the folder in your favorite editor and start writing those markdown files :)
+Then open [http://localhost:2345](http://localhost:2345) and start writing those markdown files :)
 
 ## Screenshot time!
 
