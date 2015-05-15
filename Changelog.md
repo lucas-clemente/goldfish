@@ -7,6 +7,7 @@
 - Changed inline equations to use single `$` wrapper
 - Added support for svg files
 - Made some improvements for small displays
+- Removed auto-refresh for now to focus on the built-in editor
 - Rebuilt client-side using ember
 
 ## 0.1.2 (2014-11-24)

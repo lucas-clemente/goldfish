@@ -2,7 +2,7 @@
 
 [Download](https://github.com/lucas-clemente/goldfish/releases)
 
-A bring-your-own-editor personal wiki / notes blend powered by markdown and git.
+A personal wiki / notes blend powered by markdown and git.
 
 Inspired by Evernote and gollum.
 
@@ -13,13 +13,12 @@ Inspired by Evernote and gollum.
 - Files are markdown with some extensions:
   - LaTeX `$\latex$` or, if you want it on its own line, `\[ \latex \]`)
   - Easier links `[[foo]]`, also works for images `[[foo.png]]`
-- If you change files on disk, they are automagically committed and updated in your browser.
 
 Future features:
 
 - Search
 - Auto-push
-- Auto-Update of folder listings (currently requires site reload)
+- Auto-Update of files and folders
 - Windows support
 
 ## Usage
