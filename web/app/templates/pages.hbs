@@ -1,6 +1,6 @@
 {{input value=q class='form-control input-lg' placeholder='Type to start searching'}}
 
-<div class="page-title">
+<div class="page-header">
   {{#if q}}
     <h1>Search for "{{q}}"</h1>
   {{else}}
@@ -15,6 +15,13 @@
         {{#link-to 'page' page.folder page}}{{page.title}}{{/link-to}}
         <small>{{page.folderPath}}</small>
       </h3>
+      {{#if q}}
+        <div class="search-matched-area">
+          &hellip;
+          {{matches-in-text page.markdownSource q}}
+          &hellip;
+        </div>
+      {{/if}}
     </div>
   {{else}}
     <div class="no-results">

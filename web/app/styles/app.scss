@@ -108,8 +108,10 @@ $fa-font-path: "/assets/fonts";
   color: $gray-light;
 }
 
-.search-result-page {
-  
+.search-matched-area {
+  mark {
+    padding: 0;
+  }
 }
 
 // Footer
