@@ -5,8 +5,9 @@ export default Ember.Route.extend({
 
   queryParams: {
     q: {
-      refreshModel: true
-    }
+      refreshModel: true,
+      replace: true,
+    },
   },
 
   model: function (params) {
