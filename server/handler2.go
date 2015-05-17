@@ -117,7 +117,7 @@ func NewHandler2(repo Repo) http.Handler {
 			return
 		}
 
-		var jsonArray []interface{}
+		jsonArray := []interface{}{}
 		for _, path := range results {
 			jsonPage, err := getPageJSON(repo, pathToID(path))
 			if err != nil {

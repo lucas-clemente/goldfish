@@ -52,7 +52,7 @@ func (r *mockRepo2) ListFiles(prefix string) ([]string, error) {
 
 func (r *mockRepo2) SearchFiles(term string) ([]string, error) {
 	if term != "foobar" {
-		panic("not imlpemented")
+		return []string{}, nil
 	}
 	return []string{"/foo/bar.md", "/foo/fuu/bar.md"}, nil
 }
@@ -157,5 +157,14 @@ var _ = Describe("Handler", func() {
 		handler.ServeHTTP(resp, req)
 		Expect(resp.Code).To(Equal(http.StatusOK))
 		Expect(resp.Body.String()).To(MatchJSON(`{"pages":[{"id":"|foo|bar.md","folder":"|foo","markdownSource":"foobar"},{"id":"|foo|fuu|bar.md","folder":"|foo|fuu","markdownSource":"foobar"}]}`))
+	})
+
+	It("searches with no results", func() {
+		handler := server.NewHandler2(repo)
+		req, err := http.NewRequest("GET", "/v2/pages?q=asdasdasdasdasd", nil)
+		Expect(err).To(BeNil())
+		handler.ServeHTTP(resp, req)
+		Expect(resp.Code).To(Equal(http.StatusOK))
+		Expect(resp.Body.String()).To(MatchJSON(`{"pages":[]}`))
 	})
 })
