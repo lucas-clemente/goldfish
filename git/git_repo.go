@@ -145,6 +145,8 @@ func (r *GitRepo) ListFiles(prefix string) ([]string, error) {
 
 // SearchFiles looks for markdown files containing `term` and returns the paths.
 func (r *GitRepo) SearchFiles(term string) ([]string, error) {
+	term = strings.ToLower(term)
+
 	// Walk through all files
 	matches := []string{}
 	err := filepath.Walk(r.path, func(path string, f os.FileInfo, err error) error {
@@ -157,7 +159,7 @@ func (r *GitRepo) SearchFiles(term string) ([]string, error) {
 			return err
 		}
 
-		if strings.Contains(string(b), term) {
+		if strings.Contains(strings.ToLower(string(b)), term) {
 			matches = append(matches, strings.TrimPrefix(path, r.path))
 		}
 
