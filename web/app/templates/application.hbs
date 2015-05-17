@@ -7,20 +7,24 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="/">
+      {{#link-to 'index' class="navbar-brand"}}
         <img src="/assets/logo.svg" alt="">
         Goldfish
-      </a>
+      {{/link-to}}
     </div>
 
     <div class="collapse navbar-collapse" id="nav-collapse">
       <ul class="nav navbar-nav">
+        {{#link-to 'folder' '|' tagName='li'}}
+          {{#link-to 'folder' '|'}}Folders{{/link-to}}
+        {{/link-to}}
+        {{#link-to 'pages' tagName='li'}}
+          {{#link-to 'pages'}}Recents{{/link-to}}
+        {{/link-to}}
       </ul>
-      <form class="navbar-form navbar-right">
-        <div class="form-group">
-          <input type="text" class="form-control" placeholder="Search (WIP)">
-        </div>
-      </form>
+      <div class="navbar-form navbar-right">
+        {{input value=searchText class="form-control page-search-box" placeholder="Search" action="search"}}
+      </div>
     </div>
   </div>
 </nav>

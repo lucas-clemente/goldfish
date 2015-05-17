@@ -1,0 +1,24 @@
+{{input value=q class='form-control input-lg' placeholder='Type to start searching'}}
+
+<div class="page-title">
+  {{#if q}}
+    <h1>Search for "{{q}}"</h1>
+  {{else}}
+    <h1>Recent pages</h1>
+  {{/if}}
+</div>
+
+<div class="list-group">
+  {{#each model as |page|}}
+    <div class="list-group-item search-result-page">
+      <h3>
+        {{#link-to 'page' page.folder page}}{{page.title}}{{/link-to}}
+        <small>{{page.folderPath}}</small>
+      </h3>
+    </div>
+  {{else}}
+    <div class="no-results">
+      No pages to show :(
+    </div>
+  {{/each}}
+</div>

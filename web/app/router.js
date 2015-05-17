@@ -10,4 +10,5 @@ export default Router.map(function() {
     this.resource('page', {path: '/pages/:page_id'});
   });
   this.route('not-found', {path: '/*path'});
+  this.route('pages', {path: '/pages'});
 });

@@ -2,6 +2,7 @@
 
 ## 0.2.1 (unreleased)
 
+- Added search and a view for recently modified pages, all in one!
 - Goldfish now automatically creates the data directory if it doesn't exist already
 
 ## 0.2.0 (2015-05-15)

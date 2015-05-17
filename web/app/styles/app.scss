@@ -96,6 +96,22 @@ $fa-font-path: "/assets/fonts";
   resize: none;
 }
 
+
+// Pages list
+
+.no-results {
+  text-align: center;
+
+  font-size: 2em;
+  margin-top: 2em;
+
+  color: $gray-light;
+}
+
+.search-result-page {
+  
+}
+
 // Footer
 
 $footer-height: 100px;
