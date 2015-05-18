@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -34,6 +35,8 @@ var _ = Describe("Repo", func() {
 		BeforeEach(func() {
 			var err error
 			tempDir, err = ioutil.TempDir("", "io.clemente.git.test")
+			Expect(err).To(BeNil())
+			tempDir, err := filepath.EvalSymlinks(tempDir)
 			Expect(err).To(BeNil())
 			repo, err = git.NewGitRepo(tempDir)
 			Expect(err).To(BeNil())
