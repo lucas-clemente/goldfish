@@ -7,54 +7,73 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"time"
 
+	"github.com/lucas-clemente/goldfish/repository"
 	"github.com/lucas-clemente/goldfish/server"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-type mockRepo2 struct {
-	storedData map[string]string
+type mockFile struct {
+	path     string
+	modTime  time.Time
+	contents string
 }
 
-func (r *mockRepo2) ReadFile(path string) (io.ReadCloser, error) {
-	files := map[string]string{
-		"/foo/bar.md":     "foobar",
-		"/foo/fuu/bar.md": "foobar",
-		"/baz":            "foobaz",
-	}
+var _ repository.File = &mockFile{}
 
-	if c, ok := files[path]; ok {
-		return ioutil.NopCloser(bytes.NewBufferString(c)), nil
+func (f *mockFile) Path() string {
+	return f.path
+}
+
+func (f *mockFile) Reader() (io.ReadCloser, error) {
+	return ioutil.NopCloser(bytes.NewBufferString(f.contents)), nil
+}
+
+func (f *mockFile) ModTime() time.Time {
+	return f.modTime
+}
+
+type mockRepo2 struct {
+	files map[string]*mockFile
+}
+
+var _ repository.Repo = &mockRepo2{}
+
+func (r *mockRepo2) ReadFile(path string) (repository.File, error) {
+	if f, ok := r.files[path]; ok {
+		return f, nil
 	}
 	return nil, os.ErrNotExist
 }
+
 func (r *mockRepo2) StoreFile(path string, reader io.Reader) error {
 	data, err := ioutil.ReadAll(reader)
 	if err != nil {
 		return err
 	}
-	r.storedData[path] = string(data)
+	r.files[path] = &mockFile{path: path, contents: string(data)}
 	return nil
 }
 
-func (r *mockRepo2) ListFiles(prefix string) ([]string, error) {
+func (r *mockRepo2) ListFiles(prefix string) ([]repository.File, error) {
 	if prefix == "/" {
-		return []string{"/baz", "/foo/"}, nil
+		return []repository.File{r.files["/baz"], &mockFile{path: "/foo/"}}, nil
 	} else if prefix == "/foo" {
-		return []string{"/foo/bar.md", "/foo/fuu/"}, nil
+		return []repository.File{r.files["/foo/bar.md"], &mockFile{path: "/foo/fuu/"}}, nil
 	} else if prefix == "/foo/fuu" {
-		return []string{"/foo/fuu/bar.md"}, nil
+		return []repository.File{r.files["/foo/fuu/bar.md"]}, nil
 	}
 	return nil, os.ErrNotExist
 }
 
-func (r *mockRepo2) SearchFiles(term string) ([]string, error) {
+func (r *mockRepo2) SearchFiles(term string) ([]repository.File, error) {
 	if term != "foobar" {
-		return []string{}, nil
+		return []repository.File{}, nil
 	}
-	return []string{"/foo/bar.md", "/foo/fuu/bar.md"}, nil
+	return []repository.File{r.files["/foo/bar.md"], r.files["/foo/fuu/bar.md"]}, nil
 }
 
 func (r *mockRepo2) Observer() <-chan string {
@@ -73,7 +92,11 @@ var _ = Describe("Handler", func() {
 
 	BeforeEach(func() {
 		repo = &mockRepo2{
-			storedData: map[string]string{},
+			files: map[string]*mockFile{
+				"/foo/bar.md":     &mockFile{path: "/foo/bar.md", contents: "foobar"},
+				"/foo/fuu/bar.md": &mockFile{path: "/foo/fuu/bar.md", contents: "foobar"},
+				"/baz":            &mockFile{path: "/baz", contents: "foobaz"},
+			},
 		}
 		resp = httptest.NewRecorder()
 	})
@@ -94,7 +117,7 @@ var _ = Describe("Handler", func() {
 		Expect(err).To(BeNil())
 		handler.ServeHTTP(resp, req)
 		Expect(resp.Code).To(Equal(http.StatusNoContent))
-		Expect(repo.storedData["/baz"]).To(Equal("new content"))
+		Expect(repo.files["/baz"].contents).To(Equal("new content"))
 	})
 
 	It("404s", func() {
@@ -138,7 +161,7 @@ var _ = Describe("Handler", func() {
 		Expect(err).To(BeNil())
 		handler.ServeHTTP(resp, req)
 		Expect(resp.Code).To(Equal(http.StatusOK))
-		Expect(resp.Body.String()).To(MatchJSON(`{"page":{"id":"|baz","folder":"|","markdownSource":null}}`))
+		Expect(resp.Body.String()).To(MatchJSON(`{"page":{"id":"|baz","folder":"|","markdownSource":null,"modifiedAt": "0001-01-01T00:00:00Z"}}`))
 	})
 
 	It("GETs markdown pages", func() {
@@ -147,7 +170,7 @@ var _ = Describe("Handler", func() {
 		Expect(err).To(BeNil())
 		handler.ServeHTTP(resp, req)
 		Expect(resp.Code).To(Equal(http.StatusOK))
-		Expect(resp.Body.String()).To(MatchJSON(`{"page":{"id":"|foo|bar.md","folder":"|foo","markdownSource":"foobar"}}`))
+		Expect(resp.Body.String()).To(MatchJSON(`{"page":{"id":"|foo|bar.md","folder":"|foo","markdownSource":"foobar","modifiedAt": "0001-01-01T00:00:00Z"}}`))
 	})
 
 	It("searches markdown pages", func() {
@@ -156,7 +179,7 @@ var _ = Describe("Handler", func() {
 		Expect(err).To(BeNil())
 		handler.ServeHTTP(resp, req)
 		Expect(resp.Code).To(Equal(http.StatusOK))
-		Expect(resp.Body.String()).To(MatchJSON(`{"pages":[{"id":"|foo|bar.md","folder":"|foo","markdownSource":"foobar"},{"id":"|foo|fuu|bar.md","folder":"|foo|fuu","markdownSource":"foobar"}]}`))
+		Expect(resp.Body.String()).To(MatchJSON(`{"pages":[{"id":"|foo|bar.md","folder":"|foo","markdownSource":"foobar","modifiedAt": "0001-01-01T00:00:00Z"},{"id":"|foo|fuu|bar.md","folder":"|foo|fuu","markdownSource":"foobar","modifiedAt": "0001-01-01T00:00:00Z"}]}`))
 	})
 
 	It("searches with no results", func() {

@@ -10,16 +10,17 @@ import (
 	"strings"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/lucas-clemente/goldfish/repository"
 )
 
 // NewHandler2 makes a http.Handler for a given repo.
-func NewHandler2(repo Repo) http.Handler {
+func NewHandler2(repo repository.Repo) http.Handler {
 	router := httprouter.New()
 
 	router.GET("/v2/raw/*path", func(w http.ResponseWriter, _ *http.Request, p httprouter.Params) {
 		path := p.ByName("path")
 
-		c, err := repo.ReadFile(path)
+		f, err := repo.ReadFile(path)
 		if err != nil {
 			if os.IsNotExist(err) {
 				http.NotFound(w, nil)
@@ -28,11 +29,17 @@ func NewHandler2(repo Repo) http.Handler {
 			}
 			return
 		}
-		defer c.Close()
+
+		reader, err := f.Reader()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer reader.Close()
 
 		w.Header().Set("Content-Type", getContentType(path))
 
-		if _, err := io.Copy(w, c); err != nil {
+		if _, err := io.Copy(w, reader); err != nil {
 			log.Println(err)
 		}
 	})
@@ -61,10 +68,11 @@ func NewHandler2(repo Repo) http.Handler {
 		subfolderIDs := []string{}
 
 		for _, entry := range entries {
-			if entry[len(entry)-1] == '/' {
-				subfolderIDs = append(subfolderIDs, pathToID(entry[0:len(entry)-1]))
+			entryPath := entry.Path()
+			if entryPath[len(entryPath)-1] == '/' {
+				subfolderIDs = append(subfolderIDs, pathToID(entryPath[0:len(entryPath)-1]))
 			} else {
-				pageIDs = append(pageIDs, pathToID(entry))
+				pageIDs = append(pageIDs, pathToID(entryPath))
 			}
 		}
 
@@ -92,7 +100,17 @@ func NewHandler2(repo Repo) http.Handler {
 	router.GET("/v2/pages/*id", func(w http.ResponseWriter, _ *http.Request, p httprouter.Params) {
 		id := strings.TrimLeft(p.ByName("id"), "/")
 
-		jsonPage, err := getPageJSON(repo, id)
+		file, err := repo.ReadFile(idToPath(id))
+		if err != nil {
+			if os.IsNotExist(err) {
+				http.NotFound(w, nil)
+			} else {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+			return
+		}
+
+		jsonPage, err := getPageJSON(file)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -118,8 +136,8 @@ func NewHandler2(repo Repo) http.Handler {
 		}
 
 		jsonArray := []interface{}{}
-		for _, path := range results {
-			jsonPage, err := getPageJSON(repo, pathToID(path))
+		for _, file := range results {
+			jsonPage, err := getPageJSON(file)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
@@ -165,12 +183,8 @@ func getContentType(filename string) string {
 	return "text/plain"
 }
 
-func getPageJSON(repo Repo, id string) (interface{}, error) {
-	c, err := repo.ReadFile(idToPath(id))
-	if err != nil {
-		return nil, err
-	}
-	defer c.Close()
+func getPageJSON(file repository.File) (interface{}, error) {
+	id := pathToID(file.Path())
 
 	folder := id[0:strings.LastIndex(id, "|")]
 	if folder == "" {
@@ -179,6 +193,12 @@ func getPageJSON(repo Repo, id string) (interface{}, error) {
 
 	var markdownSource interface{}
 	if strings.HasSuffix(id, ".md") {
+		c, err := file.Reader()
+		if err != nil {
+			return nil, err
+		}
+		defer c.Close()
+
 		markdownSourceBytes, err := ioutil.ReadAll(c)
 		if err != nil {
 			return nil, err
@@ -189,6 +209,7 @@ func getPageJSON(repo Repo, id string) (interface{}, error) {
 	return (map[string]interface{}{
 		"id":             id,
 		"folder":         folder,
+		"modifiedAt":     file.ModTime(),
 		"markdownSource": markdownSource,
 	}), nil
 }

@@ -61,9 +61,10 @@ var _ = Describe("Repo", func() {
 		It("saves and reads files", func() {
 			err := repo.StoreFile("/foo/Home.md", bytes.NewBufferString("foobar"))
 			Expect(err).To(BeNil())
-			reader, err := repo.ReadFile("/foo/Home.md")
+			file, err := repo.ReadFile("/foo/Home.md")
 			Expect(err).To(BeNil())
-			defer reader.Close()
+			reader, err := file.Reader()
+			Expect(err).To(BeNil())
 			data, err := ioutil.ReadAll(reader)
 			Expect(err).To(BeNil())
 			Expect(data).To(Equal([]byte("foobar")))
@@ -93,9 +94,10 @@ var _ = Describe("Repo", func() {
 			err = repo.StoreFile("/foo/Home.md", bytes.NewBufferString("foobaz"))
 			Expect(err).To(BeNil())
 
-			reader, err := repo.ReadFile("/foo/Home.md")
+			file, err := repo.ReadFile("/foo/Home.md")
 			Expect(err).To(BeNil())
-			defer reader.Close()
+			reader, err := file.Reader()
+			Expect(err).To(BeNil())
 			data, err := ioutil.ReadAll(reader)
 			Expect(err).To(BeNil())
 			Expect(data).To(Equal([]byte("foobaz")))
@@ -118,11 +120,14 @@ var _ = Describe("Repo", func() {
 
 			files, err := repo.ListFiles("/")
 			Expect(err).To(BeNil())
-			Expect(files).To(Equal([]string{"/baz", "/foo/"}))
+			Expect(len(files)).To(Equal(2))
+			Expect(files[0].Path()).To(Equal("/baz"))
+			Expect(files[1].Path()).To(Equal("/foo/"))
 
 			files, err = repo.ListFiles("/foo/")
 			Expect(err).To(BeNil())
-			Expect(files).To(Equal([]string{"/foo/bar"}))
+			Expect(len(files)).To(Equal(1))
+			Expect(files[0].Path()).To(Equal("/foo/bar"))
 		})
 
 		It("handles not found", func() {
@@ -139,15 +144,20 @@ var _ = Describe("Repo", func() {
 
 			matches, err := repo.SearchFiles("foobar")
 			Expect(err).To(BeNil())
-			Expect(matches).To(Equal([]string{"/foo/Home.md"}))
+			Expect(len(matches)).To(Equal(1))
+			Expect(matches[0].Path()).To(Equal("/foo/Home.md"))
 
 			matches, err = repo.SearchFiles("fooba")
 			Expect(err).To(BeNil())
-			Expect(matches).To(Equal([]string{"/foo/Home.md", "/foo/NotHome.md"}))
+			Expect(len(matches)).To(Equal(2))
+			Expect(matches[0].Path()).To(Equal("/foo/Home.md"))
+			Expect(matches[1].Path()).To(Equal("/foo/NotHome.md"))
 
 			matches, err = repo.SearchFiles("")
 			Expect(err).To(BeNil())
-			Expect(matches).To(Equal([]string{"/foo/Home.md", "/foo/NotHome.md"}))
+			Expect(len(matches)).To(Equal(2))
+			Expect(matches[0].Path()).To(Equal("/foo/Home.md"))
+			Expect(matches[1].Path()).To(Equal("/foo/NotHome.md"))
 		})
 	})
 })

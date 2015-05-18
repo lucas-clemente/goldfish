@@ -12,7 +12,29 @@ import (
 
 	git2go "github.com/libgit2/git2go"
 	"github.com/lucas-clemente/treewatch"
+
+	"github.com/lucas-clemente/goldfish/repository"
 )
+
+type gitFile struct {
+	path    string
+	modTime time.Time
+	repo    *GitRepo
+}
+
+var _ repository.File = &gitFile{}
+
+func (f *gitFile) Path() string {
+	return f.path
+}
+
+func (f *gitFile) Reader() (io.ReadCloser, error) {
+	return os.Open(f.repo.absolutePath(f.path))
+}
+
+func (f *gitFile) ModTime() time.Time {
+	return f.modTime
+}
 
 // GitRepo is a git repository implementing the Repo interface for goldfish.
 type GitRepo struct {
@@ -21,6 +43,8 @@ type GitRepo struct {
 	tw   treewatch.TreeWatcher
 	fo   *fanout
 }
+
+var _ repository.Repo = &GitRepo{}
 
 // NewGitRepo opens or makes a git repo at the given path
 func NewGitRepo(repoPath string) (*GitRepo, error) {
@@ -95,8 +119,16 @@ func (r *GitRepo) StopWatching() {
 }
 
 // ReadFile reads a file from the repo
-func (r *GitRepo) ReadFile(path string) (io.ReadCloser, error) {
-	return os.Open(r.absolutePath(path))
+func (r *GitRepo) ReadFile(path string) (repository.File, error) {
+	info, err := os.Stat(r.absolutePath(path))
+	if err != nil {
+		return nil, err
+	}
+	return &gitFile{
+		path:    path,
+		modTime: info.ModTime(),
+		repo:    r,
+	}, nil
 }
 
 // StoreFile writes a file to the repo and commits it
@@ -116,7 +148,7 @@ func (r *GitRepo) StoreFile(p string, data io.Reader) error {
 }
 
 // ListFiles lists the files in a given directory
-func (r *GitRepo) ListFiles(prefix string) ([]string, error) {
+func (r *GitRepo) ListFiles(prefix string) ([]repository.File, error) {
 	if prefix[len(prefix)-1] != '/' {
 		prefix += "/"
 	}
@@ -126,7 +158,7 @@ func (r *GitRepo) ListFiles(prefix string) ([]string, error) {
 		return nil, err
 	}
 
-	files := make([]string, 0, len(fileInfos))
+	files := make([]repository.File, 0, len(fileInfos))
 
 	for _, f := range fileInfos {
 		name := f.Name()
@@ -137,18 +169,22 @@ func (r *GitRepo) ListFiles(prefix string) ([]string, error) {
 		if f.IsDir() {
 			name += "/"
 		}
-		files = append(files, name)
+		files = append(files, &gitFile{
+			path:    name,
+			modTime: f.ModTime(),
+			repo:    r,
+		})
 	}
 
 	return files, nil
 }
 
 // SearchFiles looks for markdown files containing `term` and returns the paths.
-func (r *GitRepo) SearchFiles(term string) ([]string, error) {
+func (r *GitRepo) SearchFiles(term string) ([]repository.File, error) {
 	term = strings.ToLower(term)
 
 	// Walk through all files
-	matches := []string{}
+	matches := []repository.File{}
 	err := filepath.Walk(r.path, func(path string, f os.FileInfo, err error) error {
 		if strings.Contains(path, "/.git/") || !strings.HasSuffix(path, ".md") {
 			return nil
@@ -160,7 +196,11 @@ func (r *GitRepo) SearchFiles(term string) ([]string, error) {
 		}
 
 		if strings.Contains(strings.ToLower(string(b)), term) {
-			matches = append(matches, strings.TrimPrefix(path, r.path))
+			matches = append(matches, &gitFile{
+				path:    strings.TrimPrefix(path, r.path),
+				modTime: f.ModTime(),
+				repo:    r,
+			})
 		}
 
 		return nil
