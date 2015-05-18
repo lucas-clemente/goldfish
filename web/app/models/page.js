@@ -3,6 +3,7 @@ import DS from 'ember-data';
 
 export default DS.Model.extend({
   markdownSource: DS.attr('string'),
+  modifiedAt: DS.attr('date'),
   folder: DS.belongsTo('folder', {async: true}),
 
   init: function () {
