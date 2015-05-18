@@ -9,10 +9,12 @@ export function matchesInText(params/*, hash*/) {
     return '';
   }
   var areaSize = 50;
-  var area = text.slice(Math.max(pos-areaSize, 0), Math.min(pos+areaSize, text.length-1));
-  area = area.replace(term, '<mark>' + term + '</mark>');
-  area = area.replace(/\n/g, '<br>');
-  return Ember.String.htmlSafe(area);
+  text = text.slice(Math.max(pos-areaSize, 0), Math.min(pos+areaSize, text.length-1));
+
+  pos = text.toLowerCase().indexOf(term.toLowerCase());
+  text = text.slice(0, pos) + '<mark>' + text.slice(pos, pos + term.length) + '</mark>' + text.slice(pos + term.length);
+  text = text.replace(/\n/g, '<br>');
+  return Ember.String.htmlSafe(text);
 }
 
 export default Ember.HTMLBars.makeBoundHelper(matchesInText);
