@@ -14,7 +14,7 @@ export default Ember.Controller.extend({
       var folder = this.get('model');
 
       var file = this.store.createRecord('page', {
-        id: folder.id + '|' + filename,
+        id: folder.id + filename,
         folder: folder,
       });
 
