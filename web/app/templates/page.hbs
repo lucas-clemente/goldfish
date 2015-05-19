@@ -12,6 +12,9 @@
     <a class="btn btn-default pull-right" {{action "startEditing"}}>
       <i class="fa fa-pencil"></i> Edit
     </a>
+    <div class="pull-right modification-date">
+      modified {{moment-calendar model.modifiedAt}}
+    </div>
   {{/if}}
 {{/if}}
 

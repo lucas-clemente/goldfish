@@ -14,6 +14,9 @@
 <div class="list-group">
   {{#each arrangedContent as |page|}}
     <div class="list-group-item search-result-page">
+      <div class="pull-right modification-date">
+        modified {{moment-calendar page.modifiedAt}}
+      </div>
       <h3>
         {{#link-to 'page' page.folder page}}{{page.title}}{{/link-to}}
         <small>{{page.folderPath}}</small>

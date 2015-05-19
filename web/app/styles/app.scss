@@ -17,8 +17,13 @@ $fa-font-path: "/assets/fonts";
   margin-top: 0;
 }
 
-
 @import 'input-icon-addons';
+
+.modification-date {
+  color: $gray-light;
+  padding-right: 12px;
+  padding-top: 7px;
+}
 
 // Folder list
 
