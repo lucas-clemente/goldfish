@@ -22,11 +22,13 @@ func NewHandler2(repo repository.Repo) http.Handler {
 		f, err := repo.ReadFile(path)
 		if err != nil {
 			handleErr(c, err)
+			return
 		}
 
 		reader, err := f.Reader()
 		if err != nil {
 			handleErr(c, err)
+			return
 		}
 		defer reader.Close()
 
@@ -43,6 +45,7 @@ func NewHandler2(repo repository.Repo) http.Handler {
 		err := repo.StoreFile(path, c.Request.Body)
 		if err != nil {
 			handleErr(c, err)
+			return
 		}
 		c.Writer.WriteHeader(http.StatusNoContent)
 	})
@@ -53,6 +56,7 @@ func NewHandler2(repo repository.Repo) http.Handler {
 		entries, err := repo.ListFiles(idToPath(id))
 		if err != nil {
 			handleErr(c, err)
+			return
 		}
 
 		pageIDs := []string{}
@@ -91,11 +95,13 @@ func NewHandler2(repo repository.Repo) http.Handler {
 		file, err := repo.ReadFile(idToPath(id))
 		if err != nil {
 			handleErr(c, err)
+			return
 		}
 
 		jsonPage, err := getPageJSON(file)
 		if err != nil {
 			handleErr(c, err)
+			return
 		}
 
 		c.JSON(200, map[string]interface{}{"page": jsonPage})
@@ -111,6 +117,7 @@ func NewHandler2(repo repository.Repo) http.Handler {
 		results, err := repo.SearchFiles(searchTerm)
 		if err != nil {
 			handleErr(c, err)
+			return
 		}
 
 		jsonArray := []interface{}{}
@@ -118,6 +125,7 @@ func NewHandler2(repo repository.Repo) http.Handler {
 			jsonPage, err := getPageJSON(file)
 			if err != nil {
 				handleErr(c, err)
+				return
 			}
 			jsonArray = append(jsonArray, jsonPage)
 		}
