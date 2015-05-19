@@ -1,0 +1,33 @@
+{{#if model.isMarkdown}}
+  {{#link-to 'page.edit' model class='btn btn-default pull-right'}}
+    <i class="fa fa-pencil"></i> Edit
+  {{/link-to}}
+  <div class="pull-right modification-date">
+    modified {{moment-calendar model.modifiedAt}}
+  </div>
+{{/if}}
+
+
+<div class="page-header">
+  <h1>
+    {{model.title}}
+    <small>{{model.folderPath}}</small>
+  </h1>
+</div>
+
+{{#if model.isMarkdown}}
+  <div class="page-markdown">
+    {{render-markdown compiledMarkdown=model.compiledMarkdown}}
+  </div>
+{{else if model.isImage}}
+  <div class="page-image">
+    <img src="{{model.rawPath}}">
+  </div>
+{{else}}
+  <div class="page-unsupported">
+    <img src="/assets/confused_fish.svg" alt="">
+    <p>
+      Goldfish can't remember how to display this file :S
+    </p>
+  </div>
+{{/if}}

@@ -1,0 +1,18 @@
+<div class="btn-group pull-right">
+  <a class="btn btn-default" {{action "discardChanges"}}>
+    <i class="fa fa-times"></i> Discard
+  </a>
+  <a class="btn btn-success" {{action "saveChanges"}}>
+    <i class="fa fa-check"></i> Save
+  </a>
+</div>
+
+<div class="page-header">
+  <h1>
+    Editing
+    {{model.title}}
+    <small>{{model.folderPath}}</small>
+  </h1>
+</div>
+
+{{textarea-autosize value=model.markdownSource class="markdown-edit" placeholder='Type markdown here'}}
