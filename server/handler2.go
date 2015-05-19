@@ -1,7 +1,6 @@
 package server
 
 import (
-	"encoding/json"
 	"io"
 	"io/ioutil"
 	"log"
@@ -9,59 +8,51 @@ import (
 	"os"
 	"strings"
 
-	"github.com/julienschmidt/httprouter"
+	"github.com/gin-gonic/gin"
 	"github.com/lucas-clemente/goldfish/repository"
 )
 
 // NewHandler2 makes a http.Handler for a given repo.
 func NewHandler2(repo repository.Repo) http.Handler {
-	router := httprouter.New()
+	router := gin.New()
 
-	router.GET("/v2/raw/*path", func(w http.ResponseWriter, _ *http.Request, p httprouter.Params) {
-		path := p.ByName("path")
+	router.GET("/v2/raw/*path", func(c *gin.Context) {
+		path := c.Params.ByName("path")
 
 		f, err := repo.ReadFile(path)
 		if err != nil {
-			if os.IsNotExist(err) {
-				http.NotFound(w, nil)
-			} else {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-			}
-			return
+			handleErr(c, err)
 		}
 
 		reader, err := f.Reader()
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+			handleErr(c, err)
 		}
 		defer reader.Close()
 
-		w.Header().Set("Content-Type", getContentType(path))
+		c.Writer.Header().Set("Content-Type", getContentType(path))
 
-		if _, err := io.Copy(w, reader); err != nil {
+		if _, err := io.Copy(c.Writer, reader); err != nil {
 			log.Println(err)
 		}
 	})
 
-	router.POST("/v2/raw/*path", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		path := p.ByName("path")
+	router.POST("/v2/raw/*path", func(c *gin.Context) {
+		path := c.Params.ByName("path")
 
-		err := repo.StoreFile(path, r.Body)
+		err := repo.StoreFile(path, c.Request.Body)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+			handleErr(c, err)
 		}
-		w.WriteHeader(http.StatusNoContent)
+		c.Writer.WriteHeader(http.StatusNoContent)
 	})
 
-	router.GET("/v2/folders/*id", func(w http.ResponseWriter, _ *http.Request, p httprouter.Params) {
-		id := strings.TrimLeft(p.ByName("id"), "/")
+	router.GET("/v2/folders/*id", func(c *gin.Context) {
+		id := strings.TrimLeft(c.Params.ByName("id"), "/")
 
 		entries, err := repo.ListFiles(idToPath(id))
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+			handleErr(c, err)
 		}
 
 		pageIDs := []string{}
@@ -84,7 +75,7 @@ func NewHandler2(repo repository.Repo) http.Handler {
 			}
 		}
 
-		err = json.NewEncoder(w).Encode(map[string]interface{}{
+		c.JSON(200, map[string]interface{}{
 			"folder": map[string]interface{}{
 				"id":           id,
 				"pages":        pageIDs,
@@ -92,74 +83,49 @@ func NewHandler2(repo repository.Repo) http.Handler {
 				"parentFolder": parentID,
 			},
 		})
-		if err != nil {
-			log.Println(err)
-		}
 	})
 
-	router.GET("/v2/pages/*id", func(w http.ResponseWriter, _ *http.Request, p httprouter.Params) {
-		id := strings.TrimLeft(p.ByName("id"), "/")
+	router.GET("/v2/pages/*id", func(c *gin.Context) {
+		id := strings.TrimLeft(c.Params.ByName("id"), "/")
 
 		file, err := repo.ReadFile(idToPath(id))
 		if err != nil {
-			if os.IsNotExist(err) {
-				http.NotFound(w, nil)
-			} else {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-			}
-			return
+			handleErr(c, err)
 		}
 
 		jsonPage, err := getPageJSON(file)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+			handleErr(c, err)
 		}
 
-		err = json.NewEncoder(w).Encode(map[string]interface{}{"page": jsonPage})
-		if err != nil {
-			log.Println(err)
-		}
+		c.JSON(200, map[string]interface{}{"page": jsonPage})
 	})
 
-	router.GET("/v2/pages", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	router.GET("/v2/pages", func(c *gin.Context) {
 		var searchTerm string
-		searchTermList, ok := r.URL.Query()["q"]
+		searchTermList, ok := c.Request.URL.Query()["q"]
 		if ok && len(searchTermList) != 0 {
 			searchTerm = searchTermList[0]
 		}
 
 		results, err := repo.SearchFiles(searchTerm)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+			handleErr(c, err)
 		}
 
 		jsonArray := []interface{}{}
 		for _, file := range results {
 			jsonPage, err := getPageJSON(file)
 			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
+				handleErr(c, err)
 			}
 			jsonArray = append(jsonArray, jsonPage)
 		}
 
-		err = json.NewEncoder(w).Encode(map[string]interface{}{"pages": jsonArray})
-		if err != nil {
-			log.Println(err)
-		}
+		c.JSON(200, map[string]interface{}{"pages": jsonArray})
 	})
 
 	return router
-}
-
-func handleError2(err error, w http.ResponseWriter) {
-	if os.IsNotExist(err) {
-		http.NotFound(w, nil)
-	} else {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
 }
 
 func idToPath(id string) string {
@@ -212,4 +178,11 @@ func getPageJSON(file repository.File) (interface{}, error) {
 		"modifiedAt":     file.ModTime(),
 		"markdownSource": markdownSource,
 	}), nil
+}
+
+func handleErr(c *gin.Context, err error) {
+	if os.IsNotExist(err) {
+		c.Fail(404, err)
+	}
+	c.Fail(500, err)
 }

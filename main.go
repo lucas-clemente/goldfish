@@ -12,8 +12,6 @@ import (
 	assetfs "github.com/elazarl/go-bindata-assetfs"
 
 	_ "net/http/pprof"
-
-	"github.com/lucas-clemente/go-http-logger"
 	"github.com/lucas-clemente/goldfish/git"
 	"github.com/lucas-clemente/goldfish/server"
 )
@@ -60,7 +58,5 @@ func main() {
 		w.Write(index)
 	})
 
-	log.Fatal(
-		http.ListenAndServe("localhost:"+strconv.Itoa(port), logger.Logger(http.DefaultServeMux)),
-	)
+	log.Fatal(http.ListenAndServe("localhost:"+strconv.Itoa(port), nil))
 }
