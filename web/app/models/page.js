@@ -117,6 +117,7 @@ export default DS.Model.extend({
     .fail(function () {
       console.error('error saving to ', path);
     });
+    this.set('modifiedAt', Date.now());
   },
 
   compiledMarkdown: Ember.computed('markdownSource', function () {
