@@ -4,8 +4,22 @@
   </div>
   <div class="col-md-3 col-md-pull-9">
     <div class="list-group nav-list">
-      <div class="list-group-item nav-item-current-path">
-        {{model.path}}
+      <div class="list-group-item">
+        <a class="btn btn-default btn-xs pull-right btn-new-file" {{action 'startStopAddingNewFile'}}>
+          <i class="fa fa-plus"></i>
+        </a>
+
+        <div class="path">
+          {{model.path}}
+        </div>
+
+        {{#if addingNewFile}}
+          <div class="input-group input-group-new-file-name">
+            {{input value=newFileName class='form-control' placeholder='Enter new file name' action='addNewFile'}}
+            <span class="input-group-addon">.md</span>
+          </div>
+
+        {{/if}}
       </div>
       {{#if model.parentFolder}}
         {{#link-to 'folder' model.parentFolder.id class="list-group-item nav-item-back"}}

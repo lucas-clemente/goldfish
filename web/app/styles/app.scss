@@ -25,15 +25,15 @@ $fa-font-path: "/assets/fonts";
   padding-top: 7px;
 }
 
+.path {
+  font-family: $font-family-monospace;
+  font-size: 0.85em;
+  color: lighten($text-color, 30%);
+}
+
 // Folder list
 
 .nav-list {
-  .nav-item-current-path {
-    font-family: $font-family-monospace;
-    font-size: 12px;
-    color: lighten($text-color, 30%);
-  }
-
   .nav-item-file,
   .nav-item-folder {
     i {
@@ -46,6 +46,14 @@ $fa-font-path: "/assets/fonts";
     border-color: lighten(#428bca, 20%);
     color: #fff;
   }
+}
+
+.btn-new-file {
+  margin-top: -2px;
+}
+
+.input-group-new-file-name {
+  margin-top: 10px;
 }
 
 
