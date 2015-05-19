@@ -16,10 +16,16 @@
     <div class="collapse navbar-collapse" id="nav-collapse">
       <ul class="nav navbar-nav">
         {{#link-to 'folder' '|' tagName='li'}}
-          {{#link-to 'folder' '|'}}Folders{{/link-to}}
+          {{#link-to 'folder' '|'}}
+            <i class="fa fa-folder-open"></i>
+            Folders
+          {{/link-to}}
         {{/link-to}}
         {{#link-to 'pages' tagName='li'}}
-          {{#link-to 'pages'}}Recents{{/link-to}}
+          {{#link-to 'pages'}}
+            <i class="fa fa-clock-o"></i>
+            Recents
+          {{/link-to}}
         {{/link-to}}
       </ul>
       <div class="navbar-form navbar-right">
