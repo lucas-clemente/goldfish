@@ -16,5 +16,9 @@ export default DS.Model.extend({
 
   path: Ember.computed('id', function () {
     return this.id.replace(/\|/g, '/');
-  })
+  }),
+
+  isRootAndEmpty: Ember.computed('subfolders.[]', 'pages.[]', 'id', function () {
+    return this.get('subfolders.length') === 0 && this.get('pages.length') === 0 && this.id === '|';
+  }),
 });

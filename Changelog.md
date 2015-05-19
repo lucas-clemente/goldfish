@@ -4,6 +4,7 @@
 
 - Added search and a view for recently modified pages, all in one!
 - Added the ability to create new files via the web interface
+- Added simple usage instructions when opening an empty repo
 - Goldfish now automatically creates the data directory if it doesn't exist already
 
 ## 0.2.0 (2015-05-15)
