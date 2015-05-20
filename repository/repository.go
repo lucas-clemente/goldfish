@@ -16,6 +16,7 @@ type File interface {
 type Repo interface {
 	ReadFile(path string) (File, error)
 	StoreFile(path string, content io.Reader) error
+	DeleteFile(path string) error
 	ListFiles(prefix string) ([]File, error)
 	SearchFiles(term string) ([]File, error)
 

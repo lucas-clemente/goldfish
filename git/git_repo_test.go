@@ -78,6 +78,13 @@ var _ = Describe("Repo", func() {
 			})
 		})
 
+		It("deletes files", func() {
+			err := repo.StoreFile("/foo/Home.md", bytes.NewBufferString("foobar"))
+			Expect(err).To(BeNil())
+			err = repo.DeleteFile("/foo/Home.md")
+			Expect(err).To(BeNil())
+		})
+
 		It("notifies about changes", func() {
 			c := repo.Observer()
 			err := repo.StoreFile("/foo/Home.md", bytes.NewBufferString("foobar"))

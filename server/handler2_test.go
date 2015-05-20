@@ -58,6 +58,11 @@ func (r *mockRepo2) StoreFile(path string, reader io.Reader) error {
 	return nil
 }
 
+func (r *mockRepo2) DeleteFile(path string) error {
+	delete(r.files, path)
+	return nil
+}
+
 func (r *mockRepo2) ListFiles(prefix string) ([]repository.File, error) {
 	if prefix == "/" {
 		return []repository.File{r.files["/baz"], &mockFile{path: "/foo/"}}, nil
@@ -171,6 +176,15 @@ var _ = Describe("Handler", func() {
 		handler.ServeHTTP(resp, req)
 		Expect(resp.Code).To(Equal(http.StatusOK))
 		Expect(resp.Body.String()).To(MatchJSON(`{"page":{"id":"|foo|bar.md","folder":"|foo","markdownSource":"foobar","modifiedAt": "0001-01-01T00:00:00Z"}}`))
+	})
+
+	It("DELTEs pages", func() {
+		handler := server.NewHandler2(repo)
+		req, err := http.NewRequest("DELETE", "/v2/pages/|baz", nil)
+		Expect(err).To(BeNil())
+		handler.ServeHTTP(resp, req)
+		Expect(resp.Code).To(Equal(http.StatusNoContent))
+		Expect(repo.files).ToNot(HaveKey("/baz"))
 	})
 
 	It("searches markdown pages", func() {

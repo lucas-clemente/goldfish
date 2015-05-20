@@ -107,6 +107,16 @@ func NewHandler2(repo repository.Repo) http.Handler {
 		c.JSON(200, map[string]interface{}{"page": jsonPage})
 	})
 
+	router.DELETE("/v2/pages/:id", func(c *gin.Context) {
+		id := c.Params.ByName("id")
+
+		if err := repo.DeleteFile(idToPath(id)); err != nil {
+			handleErr(c, err)
+			return
+		}
+		c.Writer.WriteHeader(http.StatusNoContent)
+	})
+
 	router.GET("/v2/pages", func(c *gin.Context) {
 		var searchTerm string
 		searchTermList, ok := c.Request.URL.Query()["q"]

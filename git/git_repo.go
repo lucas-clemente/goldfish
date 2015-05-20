@@ -147,6 +147,11 @@ func (r *GitRepo) StoreFile(p string, data io.Reader) error {
 	return err
 }
 
+// DeleteFile deletes a file
+func (r *GitRepo) DeleteFile(p string) error {
+	return os.Remove(r.absolutePath(p))
+}
+
 // ListFiles lists the files in a given directory
 func (r *GitRepo) ListFiles(prefix string) ([]repository.File, error) {
 	if prefix[len(prefix)-1] != '/' {
