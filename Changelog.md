@@ -1,13 +1,18 @@
 # Goldfish Changelog
 
-## 0.2.1 (unreleased)
+## 0.2.1 (2015-05-21)
 
-- Added search and a view for recently modified pages, all in one!
-- Added the ability to create new files via the web interface
-- Added the ability to delete files via the web interface
-- Added the ability to display PDF files
-- Added support for opening files with the system default app
-- Added simple usage instructions when opening an empty repo
+Features:
+
+- New page for search and recently modified pages, all in one!
+- Create new files via the web interface
+- Delete files via the web interface
+- Display PDF files
+- Open files with the system default app
+- Simple usage instructions when opening an empty repo
+
+Bugfixes:
+
 - Goldfish now automatically creates the data directory if it doesn't exist already
 
 ## 0.2.0 (2015-05-15)
