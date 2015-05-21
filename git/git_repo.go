@@ -11,7 +11,7 @@ import (
 	"time"
 
 	git2go "github.com/libgit2/git2go"
-	"github.com/lucas-clemente/treewatch"
+	"github.com/rjeczalik/notify"
 
 	"github.com/lucas-clemente/goldfish/repository"
 )
@@ -38,10 +38,10 @@ func (f *gitFile) ModTime() time.Time {
 
 // GitRepo is a git repository implementing the Repo interface for goldfish.
 type GitRepo struct {
-	path string
-	repo *git2go.Repository
-	tw   treewatch.TreeWatcher
-	fo   *fanout
+	path            string
+	repo            *git2go.Repository
+	fo              *fanout
+	notifyEventChan chan notify.EventInfo
 }
 
 var _ repository.Repo = &GitRepo{}
@@ -80,16 +80,24 @@ func NewGitRepo(repoPath string) (*GitRepo, error) {
 		}
 	}
 
-	tw, err := treewatch.NewTreeWatcher(repoPath)
-	if err != nil {
+	foChan := make(chan string)
+	notifyEventChan := make(chan notify.EventInfo, 128)
+
+	if err := notify.Watch(repoPath+"/...", notifyEventChan, notify.All); err != nil {
 		return nil, err
 	}
 
-	foChan := make(chan string)
-	r := &GitRepo{path: repoPath, repo: repo, tw: tw, fo: newFanout(foChan)}
+	r := &GitRepo{
+		path:            repoPath,
+		repo:            repo,
+		fo:              newFanout(foChan),
+		notifyEventChan: notifyEventChan,
+	}
 
 	go func() {
-		for file := range tw.Changes() {
+		for eventInfo := range notifyEventChan {
+			file := eventInfo.Path()
+
 			if !strings.HasPrefix(file, r.path) {
 				continue
 			}
@@ -120,7 +128,7 @@ func (r *GitRepo) LocalPathForFile(path string) (string, error) {
 
 // StopWatching stops watching for changes in the repo
 func (r *GitRepo) StopWatching() {
-	r.tw.Stop()
+	notify.Stop(r.notifyEventChan)
 }
 
 // ReadFile reads a file from the repo

@@ -46,7 +46,7 @@ var _ = Describe("Repo", func() {
 		AfterEach(func() {
 			repo.StopWatching()
 			// Give the fs events some time to get processed before deleting the repo
-			time.Sleep(200 * time.Millisecond)
+			time.Sleep(100 * time.Millisecond)
 			os.RemoveAll(tempDir)
 		})
 
