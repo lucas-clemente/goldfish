@@ -20,6 +20,8 @@ type Repo interface {
 	ListFiles(prefix string) ([]File, error)
 	SearchFiles(term string) ([]File, error)
 
+	LocalPathForFile(path string) (string, error)
+
 	Observer() <-chan string
 	CloseObserver(<-chan string)
 }

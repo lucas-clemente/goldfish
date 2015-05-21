@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/lucas-clemente/goldfish/repository"
+	"github.com/skratchdot/open-golang/open"
 )
 
 // NewHandler2 makes a http.Handler for a given repo.
@@ -114,6 +115,24 @@ func NewHandler2(repo repository.Repo) http.Handler {
 			handleErr(c, err)
 			return
 		}
+		c.Writer.WriteHeader(http.StatusNoContent)
+	})
+
+	router.POST("/v2/pages/:id/open", func(c *gin.Context) {
+		id := c.Params.ByName("id")
+
+		p, err := repo.LocalPathForFile(idToPath(id))
+
+		if err != nil {
+			handleErr(c, err)
+			return
+		}
+
+		if err := open.Run(p); err != nil {
+			handleErr(c, err)
+			return
+		}
+
 		c.Writer.WriteHeader(http.StatusNoContent)
 	})
 

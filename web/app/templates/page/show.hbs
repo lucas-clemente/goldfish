@@ -38,9 +38,17 @@
     <i class="fa fa-share"></i>
     View in separate tab
   </a>
+  <a class="btn btn-default btn-file-actions" {{action 'open'}}>
+    <i class="fa fa-rocket"></i>
+    Open with default app
+  </a>
   <object class="page-pdf" data="{{model.rawPath}}" type="application/pdf">
   </object>
 {{else}}
+  <a class="btn btn-default btn-file-actions" {{action 'open'}}>
+    <i class="fa fa-rocket"></i>
+    Open with default app
+  </a>
   <div class="page-unsupported">
     <img src="/assets/confused_fish.svg" alt="">
     <p>

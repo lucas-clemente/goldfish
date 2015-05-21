@@ -81,6 +81,10 @@ func (r *mockRepo2) SearchFiles(term string) ([]repository.File, error) {
 	return []repository.File{r.files["/foo/bar.md"], r.files["/foo/fuu/bar.md"]}, nil
 }
 
+func (*mockRepo2) LocalPathForFile(_ string) (string, error) {
+	panic("not implemented")
+}
+
 func (r *mockRepo2) Observer() <-chan string {
 	panic("not implemented")
 }

@@ -10,5 +10,9 @@ export default Ember.Controller.extend({
       this.get('model').destroyRecord();
       this.transitionToRoute('folder', folder);
     },
+
+    open: function () {
+      this.get('model').open();
+    },
   },
 });

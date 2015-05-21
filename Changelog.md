@@ -6,6 +6,7 @@
 - Added the ability to create new files via the web interface
 - Added the ability to delete files via the web interface
 - Added the ability to display PDF files
+- Added support for opening files with the system default app
 - Added simple usage instructions when opening an empty repo
 - Goldfish now automatically creates the data directory if it doesn't exist already
 

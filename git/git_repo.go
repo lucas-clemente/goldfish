@@ -113,6 +113,11 @@ func NewGitRepo(repoPath string) (*GitRepo, error) {
 	return r, nil
 }
 
+// LocalPathForFile returns the full local path for a file
+func (r *GitRepo) LocalPathForFile(path string) (string, error) {
+	return r.absolutePath(path), nil
+}
+
 // StopWatching stops watching for changes in the repo
 func (r *GitRepo) StopWatching() {
 	r.tw.Stop()
