@@ -15,6 +15,8 @@ import (
 
 // NewHandler2 makes a http.Handler for a given repo.
 func NewHandler2(repo repository.Repo) http.Handler {
+	gin.SetMode(gin.ReleaseMode)
+
 	router := gin.New()
 
 	router.GET("/v2/raw/*path", func(c *gin.Context) {
