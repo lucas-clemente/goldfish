@@ -33,6 +33,13 @@
   <div class="page-image">
     <img src="{{model.rawPath}}">
   </div>
+{{else if model.isPDF}}
+  <a href="{{model.rawPath}}" target="_blank" class="btn btn-default btn-file-actions">
+    <i class="fa fa-share"></i>
+    View in separate tab
+  </a>
+  <object class="page-pdf" data="{{model.rawPath}}" type="application/pdf">
+  </object>
 {{else}}
   <div class="page-unsupported">
     <img src="/assets/confused_fish.svg" alt="">

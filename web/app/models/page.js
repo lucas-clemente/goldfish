@@ -31,6 +31,8 @@ export default DS.Model.extend({
       case "jpg":
       case "svg":
         return "file-image-o";
+      case "pdf":
+        return "file-pdf-o";
       default:
         return "file-o";
     }
@@ -55,12 +57,16 @@ export default DS.Model.extend({
   }),
 
   // --------------------------------------------------------------------------
-  // -- Image specific --------------------------------------------------------
+  // -- Misc file formats -----------------------------------------------------
   // --------------------------------------------------------------------------
 
   isImage: Ember.computed('extension', function () {
     var ext = this.get('extension');
     return ext === 'jpg' || ext === 'png' || ext === 'svg';
+  }),
+
+  isPDF: Ember.computed('extension', function () {
+    return this.get('extension') === 'pdf';
   }),
 
   // --------------------------------------------------------------------------

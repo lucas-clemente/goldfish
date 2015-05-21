@@ -163,6 +163,8 @@ func getContentType(filename string) string {
 		return "image/png"
 	case "svg":
 		return "image/svg+xml"
+	case "pdf":
+		return "application/pdf"
 	}
 	return "text/plain"
 }
