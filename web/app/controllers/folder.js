@@ -13,8 +13,11 @@ export default Ember.Controller.extend({
       var filename = this.get('newFileName') + '.md';
       var folder = this.get('model');
 
+      var id = folder.id + '|' + filename;
+      id = id.replace('||', '|');
+
       var file = this.store.createRecord('page', {
-        id: folder.id + filename,
+        id: id,
         folder: folder,
       });
 
