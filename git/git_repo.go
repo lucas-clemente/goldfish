@@ -5,12 +5,12 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
 	"time"
 
-	git2go "github.com/libgit2/git2go"
 	"github.com/rjeczalik/notify"
 
 	"github.com/lucas-clemente/goldfish/repository"
@@ -39,7 +39,6 @@ func (f *gitFile) ModTime() time.Time {
 // GitRepo is a git repository implementing the Repo interface for goldfish.
 type GitRepo struct {
 	path            string
-	repo            *git2go.Repository
 	fo              *fanout
 	notifyEventChan chan notify.EventInfo
 }
@@ -48,34 +47,17 @@ var _ repository.Repo = &GitRepo{}
 
 // NewGitRepo opens or makes a git repo at the given path
 func NewGitRepo(repoPath string) (*GitRepo, error) {
-	repo, err := git2go.OpenRepository(repoPath)
-	if err != nil {
-		repo, err = git2go.InitRepository(repoPath, false)
-		if err != nil {
+	if _, err := os.Stat(repoPath + "/.git"); err != nil {
+		// Run git init <dir>
+		// Note that this creates the dir
+		if err := exec.Command("git", "init", repoPath).Run(); err != nil {
 			return nil, err
 		}
 
-		// Make empty tree
-		index, err := repo.Index()
-		if err != nil {
-			return nil, err
-		}
-		defer index.Free()
-
-		treeID, err := index.WriteTree()
-		if err != nil {
-			return nil, err
-		}
-
-		tree, err := repo.LookupTree(treeID)
-		if err != nil {
-			return nil, err
-		}
-
-		defer tree.Free()
-		sig := &git2go.Signature{Name: "system", Email: "goldfish@clemente.io", When: time.Now()}
-		_, err = repo.CreateCommit("refs/heads/master", sig, sig, "initial commit", tree)
-		if err != nil {
+		// Make an empty initial commit
+		cmd := exec.Command("git", "commit", "--allow-empty", "-m", "initial commit")
+		cmd.Dir = repoPath
+		if err := cmd.Run(); err != nil {
 			return nil, err
 		}
 	}
@@ -89,7 +71,6 @@ func NewGitRepo(repoPath string) (*GitRepo, error) {
 
 	r := &GitRepo{
 		path:            repoPath,
-		repo:            repo,
 		fo:              newFanout(foChan),
 		notifyEventChan: notifyEventChan,
 	}
@@ -112,7 +93,7 @@ func NewGitRepo(repoPath string) (*GitRepo, error) {
 			log.Printf("file %s changed\n", file)
 			err := r.addAllAndCommit("changed " + file)
 			if err != nil {
-				log.Println(err)
+				log.Printf("error committing: %v\n", err)
 			}
 		}
 		close(foChan)
@@ -240,63 +221,26 @@ func (r *GitRepo) CloseObserver(c <-chan string) {
 }
 
 func (r *GitRepo) addAllAndCommit(message string) error {
-	index, err := r.repo.Index()
+	cmd := exec.Command("git", "add", "-A")
+	cmd.Dir = r.path
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+
+	// Check if there are changes
+	cmd = exec.Command("git", "status", "--porcelain")
+	cmd.Dir = r.path
+	statusOutput, err := cmd.Output()
 	if err != nil {
 		return err
 	}
-	defer index.Free()
-
-	if err := index.AddAll([]string{}, git2go.IndexAddDefault, nil); err != nil {
-		return err
-	}
-
-	if err := index.UpdateAll([]string{}, nil); err != nil {
-		return err
-	}
-
-	if err := index.Write(); err != nil {
-		return err
-	}
-
-	treeID, err := index.WriteTree()
-	if err != nil {
-		return err
-	}
-
-	return r.commit(treeID, message)
-}
-
-func (r *GitRepo) headCommit() (*git2go.Commit, error) {
-	headRef, err := r.repo.Head()
-	defer headRef.Free()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	headID := headRef.Target()
-	return r.repo.LookupCommit(headID)
-}
-
-func (r *GitRepo) commit(treeID *git2go.Oid, message string) error {
-	tree, err := r.repo.LookupTree(treeID)
-	if err != nil {
-		return err
-	}
-	defer tree.Free()
-
-	headCommit, err := r.headCommit()
-	if err != nil {
-		return err
-	}
-	defer headCommit.Free()
-
-	if *treeID == *headCommit.TreeId() {
+	if len(statusOutput) == 0 {
 		return nil
 	}
 
-	sig := &git2go.Signature{Name: "system", Email: "goldfish@clemente.io", When: time.Now()}
-	_, err = r.repo.CreateCommit("refs/heads/master", sig, sig, message, tree, headCommit)
-	if err != nil {
+	cmd = exec.Command("git", "commit", "-m", message)
+	cmd.Dir = r.path
+	if err := cmd.Run(); err != nil {
 		return err
 	}
 

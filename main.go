@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
 
 	assetfs "github.com/elazarl/go-bindata-assetfs"
 
 	_ "net/http/pprof"
+
 	"github.com/lucas-clemente/goldfish/git"
 	"github.com/lucas-clemente/goldfish/server"
 )
@@ -27,10 +27,6 @@ func main() {
 	}
 
 	path := flag.Arg(0)
-
-	if err := os.MkdirAll(path, os.ModeDir|0755); err != nil {
-		log.Fatal(err)
-	}
 
 	path, err := filepath.EvalSymlinks(path)
 	if err != nil {
