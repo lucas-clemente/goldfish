@@ -2,3 +2,4 @@ build/
 tmp/
 bindata.go
 gin-bin
+goldfish
