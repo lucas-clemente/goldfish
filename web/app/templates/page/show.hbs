@@ -1,11 +1,21 @@
-{{#if model.isMarkdown}}
-  {{#link-to 'page.edit' model class='btn btn-default pull-right'}}
+<div class="btn-group pull-right">
+  {{#link-to 'page.edit' model class='btn btn-default'}}
     <i class="fa fa-pencil"></i> Edit
   {{/link-to}}
-  <div class="pull-right modification-date">
-    modified {{moment-calendar model.modifiedAt}}
-  </div>
-{{/if}}
+  <a class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+    <i class="fa fa-caret-down"></i>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a {{action 'deletePage'}}><i class="fa fa-trash-o"></i> Delete</a>
+    </li>
+  </ul>
+</div>
+
+
+<div class="pull-right modification-date">
+  modified {{moment-calendar model.modifiedAt}}
+</div>
 
 
 <div class="page-header">

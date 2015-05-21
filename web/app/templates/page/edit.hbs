@@ -15,4 +15,6 @@
   </h1>
 </div>
 
-{{textarea-autosize value=model.markdownSource class="markdown-edit" placeholder='Type markdown here'}}
+{{#if model.isMarkdown}}
+  {{textarea-autosize value=model.markdownSource class="markdown-edit" placeholder='Type markdown here'}}
+{{/if}}
