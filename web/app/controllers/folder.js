@@ -21,7 +21,7 @@ export default Ember.Controller.extend({
         folder: folder,
       });
 
-      this.transitionTo('page.edit', file);
+      this.transitionToRoute('page.edit', file);
 
       this.set('newFileName', '');
       this.set('addingNewFile', false);
