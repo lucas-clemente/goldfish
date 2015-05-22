@@ -19,19 +19,17 @@ func NewHandler2(repo repository.Repo) http.Handler {
 
 	router := gin.New()
 
-	router.GET("/v2/raw/*path", func(c *gin.Context) {
+	router.GET("/v2/raw/*path", errorHandler(func(c *gin.Context) error {
 		path := c.Params.ByName("path")
 
 		f, err := repo.ReadFile(path)
 		if err != nil {
-			handleErr(c, err)
-			return
+			return err
 		}
 
 		reader, err := f.Reader()
 		if err != nil {
-			handleErr(c, err)
-			return
+			return err
 		}
 		defer reader.Close()
 
@@ -40,26 +38,27 @@ func NewHandler2(repo repository.Repo) http.Handler {
 		if _, err := io.Copy(c.Writer, reader); err != nil {
 			log.Println(err)
 		}
-	})
+		return nil
+	}))
 
-	router.POST("/v2/raw/*path", func(c *gin.Context) {
+	router.POST("/v2/raw/*path", errorHandler(func(c *gin.Context) error {
 		path := c.Params.ByName("path")
 
 		err := repo.StoreFile(path, c.Request.Body)
 		if err != nil {
-			handleErr(c, err)
-			return
+			return err
 		}
-		c.Writer.WriteHeader(http.StatusNoContent)
-	})
 
-	router.GET("/v2/folders/*id", func(c *gin.Context) {
-		id := strings.TrimLeft(c.Params.ByName("id"), "/")
+		c.Writer.WriteHeader(http.StatusNoContent)
+		return nil
+	}))
+
+	router.GET("/v2/folders/:id", errorHandler(func(c *gin.Context) error {
+		id := c.Params.ByName("id")
 
 		entries, err := repo.ListFiles(idToPath(id))
 		if err != nil {
-			handleErr(c, err)
-			return
+			return err
 		}
 
 		pageIDs := []string{}
@@ -90,55 +89,54 @@ func NewHandler2(repo repository.Repo) http.Handler {
 				"parentFolder": parentID,
 			},
 		})
-	})
+		return nil
+	}))
 
-	router.GET("/v2/pages/*id", func(c *gin.Context) {
-		id := strings.TrimLeft(c.Params.ByName("id"), "/")
+	router.GET("/v2/pages/:id", errorHandler(func(c *gin.Context) error {
+		id := c.Params.ByName("id")
 
 		file, err := repo.ReadFile(idToPath(id))
 		if err != nil {
-			handleErr(c, err)
-			return
+			return err
 		}
 
 		jsonPage, err := getPageJSON(file)
 		if err != nil {
-			handleErr(c, err)
-			return
+			return err
 		}
 
 		c.JSON(200, map[string]interface{}{"page": jsonPage})
-	})
+		return nil
+	}))
 
-	router.DELETE("/v2/pages/:id", func(c *gin.Context) {
+	router.DELETE("/v2/pages/:id", errorHandler(func(c *gin.Context) error {
 		id := c.Params.ByName("id")
 
 		if err := repo.DeleteFile(idToPath(id)); err != nil {
-			handleErr(c, err)
-			return
+			return err
 		}
 		c.Writer.WriteHeader(http.StatusNoContent)
-	})
+		return nil
+	}))
 
-	router.POST("/v2/pages/:id/open", func(c *gin.Context) {
+	router.POST("/v2/pages/:id/open", errorHandler(func(c *gin.Context) error {
 		id := c.Params.ByName("id")
 
 		p, err := repo.LocalPathForFile(idToPath(id))
 
 		if err != nil {
-			handleErr(c, err)
-			return
+			return err
 		}
 
 		if err := open.Run(p); err != nil {
-			handleErr(c, err)
-			return
+			return err
 		}
 
 		c.Writer.WriteHeader(http.StatusNoContent)
-	})
+		return nil
+	}))
 
-	router.GET("/v2/pages", func(c *gin.Context) {
+	router.GET("/v2/pages", errorHandler(func(c *gin.Context) error {
 		var searchTerm string
 		searchTermList, ok := c.Request.URL.Query()["q"]
 		if ok && len(searchTermList) != 0 {
@@ -147,22 +145,21 @@ func NewHandler2(repo repository.Repo) http.Handler {
 
 		results, err := repo.SearchFiles(searchTerm)
 		if err != nil {
-			handleErr(c, err)
-			return
+			return err
 		}
 
 		jsonArray := []interface{}{}
 		for _, file := range results {
 			jsonPage, err := getPageJSON(file)
 			if err != nil {
-				handleErr(c, err)
-				return
+				return err
 			}
 			jsonArray = append(jsonArray, jsonPage)
 		}
 
 		c.JSON(200, map[string]interface{}{"pages": jsonArray})
-	})
+		return nil
+	}))
 
 	return router
 }
@@ -221,9 +218,13 @@ func getPageJSON(file repository.File) (interface{}, error) {
 	}), nil
 }
 
-func handleErr(c *gin.Context, err error) {
-	if os.IsNotExist(err) {
-		c.Fail(404, err)
+func errorHandler(h func(*gin.Context) error) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if err := h(c); err != nil {
+			if os.IsNotExist(err) {
+				c.Fail(404, err)
+			}
+			c.Fail(500, err)
+		}
 	}
-	c.Fail(500, err)
 }
