@@ -33,6 +33,15 @@ export default DS.Model.extend({
         return "file-image-o";
       case "pdf":
         return "file-pdf-o";
+      case "xls":
+      case "xlsx":
+        return "file-excel-o";
+      case "ppt":
+      case "pptx":
+        return "file-powerpoint-o";
+      case "doc":
+      case "docx":
+        return "file-word-o";
       default:
         return "file-o";
     }
