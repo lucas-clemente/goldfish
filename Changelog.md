@@ -1,5 +1,11 @@
 # Goldfish Changelog
 
+## 0.2.2 (unreleased)
+
+Fixed:
+
+- Cursor issues (#52)
+
 ## 0.2.1 (2015-05-21)
 
 Features:
