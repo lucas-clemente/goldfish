@@ -9,7 +9,7 @@
     {{outlet}}
   </div>
   <div class="col-md-3 col-md-pull-9">
-    <div class="list-group nav-list">
+    {{#drop-area class='list-group nav-list' action='uploadFiles'}}
       <div class="list-group-item">
         <a class="btn btn-default btn-xs pull-right btn-new-file" {{action 'startStopAddingNewFile'}}>
           <i class="fa fa-plus"></i>
@@ -44,6 +44,6 @@
           {{page.name}}
         {{/link-to}}
       {{/each}}
-    </div>
+    {{/drop-area}}
   </div>
 </div>

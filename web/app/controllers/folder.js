@@ -26,5 +26,9 @@ export default Ember.Controller.extend({
       this.set('newFileName', '');
       this.set('addingNewFile', false);
     },
+
+    uploadFiles: function (fileList) {
+      console.log(fileList);
+    },
   },
 });

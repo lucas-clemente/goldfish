@@ -51,6 +51,10 @@ a:not([href]) {
     border-color: lighten(#428bca, 20%);
     color: #fff;
   }
+
+  &.dragging {
+    box-shadow:  0px 0px 10px green;
+  }
 }
 
 .btn-new-file {
