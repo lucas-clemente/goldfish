@@ -24,7 +24,6 @@
             {{focus-input value=newFileName class='form-control' placeholder='Enter new file name' enter='addNewFile'}}
             <span class="input-group-addon">.md</span>
           </div>
-
         {{/if}}
       </div>
       {{#if model.parentFolder}}
@@ -38,7 +37,7 @@
           {{subfolder.name}}
         {{/link-to}}
       {{/each}}
-      {{#each model.pages as |page|}}
+      {{#each model.sortedPages as |page|}}
         {{#link-to 'page' page class="list-group-item nav-item-file"}}
           <i class="fa fa-{{page.icon}}"></i>
           {{page.name}}
