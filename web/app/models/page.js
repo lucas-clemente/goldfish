@@ -79,7 +79,7 @@ export default DS.Model.extend({
     };
     req.open("POST", path, true);
     req.send(data);
-    this.set('modifiedAt', Date.now());
+    this.set('modifiedAt', new Date());
   },
 
   // --------------------------------------------------------------------------
@@ -149,7 +149,7 @@ export default DS.Model.extend({
     .fail(function () {
       console.error('error saving to ', path);
     });
-    this.set('modifiedAt', Date.now());
+    this.set('modifiedAt', new Date());
   },
 
   compiledMarkdown: Ember.computed('markdownSource', function () {
