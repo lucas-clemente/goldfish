@@ -28,7 +28,17 @@ export default Ember.Controller.extend({
     },
 
     uploadFiles: function (fileList) {
-      console.log(fileList);
+      var folder = this.get('model');
+      for (var i = 0; i < fileList.length; i++) {
+        var file = fileList.item(i);
+        var id = folder.id + '|' + file.name;
+        id = id.replace('||', '|');
+        var page = this.store.createRecord('page', {
+          id: id,
+          folder: folder,
+        });
+        page.sendData(file);
+      }
     },
   },
 });

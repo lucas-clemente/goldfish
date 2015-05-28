@@ -69,6 +69,19 @@ export default DS.Model.extend({
     Ember.$.post('/v2/pages/' + this.id + '/open');
   },
 
+  sendData: function (data) {
+    var path = this.get('rawPath');
+
+    var req = new XMLHttpRequest();
+    req.onerror = function () {
+      console.log('error uploading file');
+      console.log(arguments);
+    };
+    req.open("POST", path, true);
+    req.send(data);
+    this.set('modifiedAt', Date.now());
+  },
+
   // --------------------------------------------------------------------------
   // -- Misc file formats -----------------------------------------------------
   // --------------------------------------------------------------------------
