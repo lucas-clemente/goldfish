@@ -2,9 +2,13 @@
 
 ## 0.2.2 (unreleased)
 
+Features:
+
+- File upload via drag and drop into the folder view
+
 Fixed:
 
-- Cursor issues (#52)
+- Minor fixes and improvements
 
 ## 0.2.1 (2015-05-21)
 
