@@ -166,5 +166,49 @@ var _ = Describe("Repo", func() {
 			Expect(matches[0].Path()).To(Equal("/foo/Home.md"))
 			Expect(matches[1].Path()).To(Equal("/foo/NotHome.md"))
 		})
+
+		It("ammends previous commits", func() {
+			err := repo.StoreFile("/foo/Home.md", bytes.NewBufferString("foobar"))
+			Expect(err).To(BeNil())
+
+			// Wait for commit
+			ExpectSoon(func() bool {
+				cmd := exec.Command("git", "log", "--pretty=oneline")
+				cmd.Dir = tempDir
+				out, err := cmd.Output()
+				Expect(err).To(BeNil())
+				// 1, since the first commit got ammended into the initial one
+				if strings.Count(string(out), "\n") != 1 {
+					return false
+				}
+
+				cmd = exec.Command("git", "ls-files")
+				cmd.Dir = tempDir
+				out, err = cmd.Output()
+				Expect(err).To(BeNil())
+				return strings.Count(string(out), "\n") == 1
+			})
+
+			err = repo.StoreFile("/bar/Home.md", bytes.NewBufferString("foobar"))
+			Expect(err).To(BeNil())
+
+			// Wait for commit
+			ExpectSoon(func() bool {
+				cmd := exec.Command("git", "log", "--pretty=oneline")
+				cmd.Dir = tempDir
+				out, err := cmd.Output()
+				Expect(err).To(BeNil())
+				// 1, since the first commit got ammended into the initial one
+				if strings.Count(string(out), "\n") != 1 {
+					return false
+				}
+
+				cmd = exec.Command("git", "ls-files")
+				cmd.Dir = tempDir
+				out, err = cmd.Output()
+				Expect(err).To(BeNil())
+				return strings.Count(string(out), "\n") == 2
+			})
+		})
 	})
 })

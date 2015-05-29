@@ -238,7 +238,27 @@ func (r *GitRepo) addAllAndCommit(message string) error {
 		return nil
 	}
 
-	cmd = exec.Command("git", "commit", "-m", message)
+	// Ammend if the last commit is less than a minute ago
+	ammend := false
+	cmd = exec.Command("git", "show", "-s", "--format=%ci", "HEAD")
+	cmd.Dir = r.path
+	lastCommitDateString, err := cmd.Output()
+	if err != nil {
+		return err
+	}
+	lastCommitDate, err := time.Parse("2006-01-02 15:04:05 -0700\n", string(lastCommitDateString))
+	if err != nil {
+		return err
+	}
+	if time.Now().Sub(lastCommitDate).Minutes() < 1.0 {
+		ammend = true
+	}
+
+	commandArgs := []string{"commit", "-m", message}
+	if ammend {
+		commandArgs = append(commandArgs, "--amend")
+	}
+	cmd = exec.Command("git", commandArgs...)
 	cmd.Dir = r.path
 	if err := cmd.Run(); err != nil {
 		return err
