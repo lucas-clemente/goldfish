@@ -9,7 +9,7 @@ export function matchesInText(params/*, hash*/) {
     return '';
   }
   var areaSize = 50;
-  text = text.slice(Math.max(pos-areaSize, 0), Math.min(pos+areaSize, text.length-1));
+  text = text.slice(Math.max(pos-areaSize, 0), Math.min(pos+areaSize, text.length));
 
   pos = text.toLowerCase().indexOf(term.toLowerCase());
   text = text.slice(0, pos) + '<mark>' + text.slice(pos, pos + term.length) + '</mark>' + text.slice(pos + term.length);
