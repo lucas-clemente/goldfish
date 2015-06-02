@@ -1,20 +1,29 @@
 <div class="btn-group pull-right">
-  <a class="btn btn-default" {{action "discardChanges"}}>
-    <i class="fa fa-times"></i> Discard
-  </a>
-  <a class="btn btn-success" {{action "saveChanges"}}>
-    <i class="fa fa-check"></i> Save
+  <button class="btn btn-default" disabled={{saveDisallowed}} {{action "save"}}>
+    {{#if page.isSaving}}
+      <i class="fa fa-circle-o-notch fa-spin"></i>
+      Saving &hellip;
+    {{else if page.isDirty}}
+      <i class="fa fa-save"></i>
+      Save
+    {{else}}
+      <i class="fa fa-check-circle"></i>
+      Saved
+    {{/if}}
+  </button>
+  <a class="btn btn-success" {{action "finishEditing"}}>
+    <i class="fa fa-check"></i> Finish Editing
   </a>
 </div>
 
 <div class="page-header">
   <h1>
     Editing
-    {{model.title}}
-    <small>{{model.folderPath}}</small>
+    {{page.title}}
+    <small>{{page.folderPath}}</small>
   </h1>
 </div>
 
-{{#if model.isMarkdown}}
-  {{textarea-autosize value=model.markdownSource class="markdown-edit" placeholder='Type markdown here'}}
+{{#if page.isMarkdown}}
+  {{textarea-autosize value=page.markdownSource class="markdown-edit" placeholder='Type markdown here'}}
 {{/if}}

@@ -6,6 +6,7 @@ Features:
 
 - File upload via drag and drop into the folder view
 - Commits that are less than a minute ago are automatically ammended
+- Autosave in the web editor
 
 Fixed:
 
