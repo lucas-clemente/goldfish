@@ -224,6 +224,7 @@ func errorHandler(h func(*gin.Context) error) gin.HandlerFunc {
 			if os.IsNotExist(err) {
 				c.AbortWithError(404, err)
 			}
+			log.Println(err)
 			c.AbortWithError(500, err)
 		}
 	}
