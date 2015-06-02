@@ -113,6 +113,7 @@ export default DS.Model.extend({
           href = '/v2/raw' + href;
         } else {
           href = '/v2/raw' + this.get('folderPath') + "/" + href;
+          href = href.replace('//', '/');
         }
       }
       return '<div class="image"><img src="' + href + '" title="' + (title || '') + '" class="img-thumbnail" /></div>';
@@ -127,6 +128,9 @@ export default DS.Model.extend({
           href = href.replace('//', '/');
         }
         var refFolder = href.slice(0, href.lastIndexOf('/'));
+        if (refFolder === '') {
+          refFolder = '/';
+        }
         href = `/folders/${ refFolder.replace(/\//g, '|') }/pages/${ href.replace(/\//g, '|') }`;
       }
       return '<a href="' + href + '">' + text + '</a>';
