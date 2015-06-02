@@ -40,6 +40,6 @@ for (var i = 0; i < fontFiles.length; i++) {
   app.import(fontFiles[i], fontDir);
 }
 
-app.import('bower_components/autosize/dest/autosize.js');
+app.import('bower_components/autosize/dist/autosize.js');
 
 module.exports = app.toTree();
