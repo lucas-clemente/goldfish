@@ -1,6 +1,7 @@
 package git
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -224,7 +225,7 @@ func (r *GitRepo) addAllAndCommit(message string) error {
 	cmd := exec.Command("git", "add", "-A")
 	cmd.Dir = r.path
 	if err := cmd.Run(); err != nil {
-		return err
+		return fmt.Errorf("git add failed: %v", err)
 	}
 
 	// Check if there are changes
@@ -232,7 +233,7 @@ func (r *GitRepo) addAllAndCommit(message string) error {
 	cmd.Dir = r.path
 	statusOutput, err := cmd.Output()
 	if err != nil {
-		return err
+		return fmt.Errorf("git status failed: %v", err)
 	}
 	if len(statusOutput) == 0 {
 		return nil
@@ -244,7 +245,7 @@ func (r *GitRepo) addAllAndCommit(message string) error {
 	cmd.Dir = r.path
 	lastCommitDateString, err := cmd.Output()
 	if err != nil {
-		return err
+		return fmt.Errorf("git show failed: %v", err)
 	}
 	lastCommitDate, err := time.Parse("2006-01-02 15:04:05 -0700\n", string(lastCommitDateString))
 	if err != nil {
@@ -261,7 +262,7 @@ func (r *GitRepo) addAllAndCommit(message string) error {
 	cmd = exec.Command("git", commandArgs...)
 	cmd.Dir = r.path
 	if err := cmd.Run(); err != nil {
-		return err
+		return fmt.Errorf("git commit failed: %v", err)
 	}
 
 	return nil
