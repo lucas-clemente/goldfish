@@ -96,17 +96,9 @@ func NewHandler2(repo repository.Repo) http.Handler {
 	router.GET("/v2/pages/:id", errorHandler(func(c *gin.Context) error {
 		id := c.Params.ByName("id")
 
-		file, err := repo.ReadFile(idToPath(id))
-		if err != nil {
+		if err := respondWithPage(c, repo, 200, id); err != nil {
 			return err
 		}
-
-		jsonPage, err := getPageJSON(file)
-		if err != nil {
-			return err
-		}
-
-		c.JSON(200, map[string]interface{}{"page": jsonPage})
 		return nil
 	}))
 
@@ -127,17 +119,33 @@ func NewHandler2(repo repository.Repo) http.Handler {
 			return err
 		}
 
-		file, err := repo.ReadFile(idToPath(id))
+		if err := respondWithPage(c, repo, 200, id); err != nil {
+			return err
+		}
+		return nil
+	}))
+
+	router.POST("/v2/pages", errorHandler(func(c *gin.Context) error {
+		var jsonData struct {
+			Page struct {
+				ID             string
+				MarkdownSource string
+			}
+		}
+
+		err := c.BindJSON(&jsonData)
 		if err != nil {
 			return err
 		}
 
-		jsonPage, err := getPageJSON(file)
+		err = repo.StoreFile(idToPath(jsonData.Page.ID), bytes.NewBufferString(jsonData.Page.MarkdownSource))
 		if err != nil {
 			return err
 		}
 
-		c.JSON(200, map[string]interface{}{"page": jsonPage})
+		if err := respondWithPage(c, repo, 201, jsonData.Page.ID); err != nil {
+			return err
+		}
 		return nil
 	}))
 
@@ -260,4 +268,19 @@ func errorHandler(h func(*gin.Context) error) gin.HandlerFunc {
 			c.AbortWithError(500, err)
 		}
 	}
+}
+
+func respondWithPage(c *gin.Context, repo repository.Repo, statusOnSuccess int, id string) error {
+	file, err := repo.ReadFile(idToPath(id))
+	if err != nil {
+		return err
+	}
+
+	jsonPage, err := getPageJSON(file)
+	if err != nil {
+		return err
+	}
+
+	c.JSON(statusOnSuccess, map[string]interface{}{"page": jsonPage})
+	return nil
 }

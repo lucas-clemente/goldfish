@@ -218,4 +218,24 @@ var _ = Describe("Handler", func() {
 		Expect(resp.Code).To(Equal(http.StatusOK))
 		Expect(resp.Body.String()).To(MatchJSON(`{"page":{"id":"|baz.md","folder":"|","markdownSource":"foobar","modifiedAt": "0001-01-01T00:00:00Z"}}`))
 	})
+
+	It("PUTs pages with null markdownSource", func() {
+		handler := server.NewHandler2(repo)
+		body := bytes.NewBufferString(`{"page":{"id":"|baz.md","markdownSource":null}}`)
+		req, err := http.NewRequest("PUT", "/v2/pages/|baz.md", body)
+		Expect(err).To(BeNil())
+		handler.ServeHTTP(resp, req)
+		Expect(resp.Code).To(Equal(http.StatusOK))
+		Expect(resp.Body.String()).To(MatchJSON(`{"page":{"id":"|baz.md","folder":"|","markdownSource":"","modifiedAt": "0001-01-01T00:00:00Z"}}`))
+	})
+
+	It("POSTs pages", func() {
+		handler := server.NewHandler2(repo)
+		body := bytes.NewBufferString(`{"page":{"id":"|baz.md","markdownSource":"foobar"}}`)
+		req, err := http.NewRequest("POST", "/v2/pages", body)
+		Expect(err).To(BeNil())
+		handler.ServeHTTP(resp, req)
+		Expect(resp.Code).To(Equal(http.StatusCreated))
+		Expect(resp.Body.String()).To(MatchJSON(`{"page":{"id":"|baz.md","folder":"|","markdownSource":"foobar","modifiedAt": "0001-01-01T00:00:00Z"}}`))
+	})
 })
