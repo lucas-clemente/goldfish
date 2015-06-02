@@ -38,26 +38,30 @@ Then open [http://localhost:2345](http://localhost:2345) and start writing those
 
 Code for the page:
 
-```markdown
-# Demo Page
+    # Demo Page
 
-## Markdown
+    ## Markdown
 
-Things you can do:
+    Things you could do:
 
-- Make _important_ notes
-- Write in __strong__ letters
+    - Make _important_ notes
+    - Write in __strong__ letters
 
-## Equations
+    ## Equations
 
-Both $e^\text{inline}$ and in display mode:
+    Both $e^\text{inline}$ and in display mode:
 
-\[
-  e^{i \pi} = -1
-\]
+    \[
+      e^{i \pi} = -1
+    \]
 
-## Images
+    ## Syntax Highlighting
 
-[[fish.png]]
+    ```ruby
+    foo = Bar.new
+    puts foo if foo.baz?
+    ```
 
-```
+    ## Images
+
+    [[fish.png]]
