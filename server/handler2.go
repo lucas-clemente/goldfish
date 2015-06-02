@@ -1,6 +1,7 @@
 package server
 
 import (
+	"bytes"
 	"io"
 	"io/ioutil"
 	"log"
@@ -94,6 +95,37 @@ func NewHandler2(repo repository.Repo) http.Handler {
 
 	router.GET("/v2/pages/:id", errorHandler(func(c *gin.Context) error {
 		id := c.Params.ByName("id")
+
+		file, err := repo.ReadFile(idToPath(id))
+		if err != nil {
+			return err
+		}
+
+		jsonPage, err := getPageJSON(file)
+		if err != nil {
+			return err
+		}
+
+		c.JSON(200, map[string]interface{}{"page": jsonPage})
+		return nil
+	}))
+
+	router.PUT("/v2/pages/:id", errorHandler(func(c *gin.Context) error {
+		id := c.Params.ByName("id")
+
+		var jsonData struct {
+			Page struct{ MarkdownSource string }
+		}
+
+		err := c.BindJSON(&jsonData)
+		if err != nil {
+			return err
+		}
+
+		err = repo.StoreFile(idToPath(id), bytes.NewBufferString(jsonData.Page.MarkdownSource))
+		if err != nil {
+			return err
+		}
 
 		file, err := repo.ReadFile(idToPath(id))
 		if err != nil {

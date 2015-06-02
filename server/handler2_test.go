@@ -182,7 +182,7 @@ var _ = Describe("Handler", func() {
 		Expect(resp.Body.String()).To(MatchJSON(`{"page":{"id":"|foo|bar.md","folder":"|foo","markdownSource":"foobar","modifiedAt": "0001-01-01T00:00:00Z"}}`))
 	})
 
-	It("DELTEs pages", func() {
+	It("DELETEs pages", func() {
 		handler := server.NewHandler2(repo)
 		req, err := http.NewRequest("DELETE", "/v2/pages/|baz", nil)
 		Expect(err).To(BeNil())
@@ -207,5 +207,15 @@ var _ = Describe("Handler", func() {
 		handler.ServeHTTP(resp, req)
 		Expect(resp.Code).To(Equal(http.StatusOK))
 		Expect(resp.Body.String()).To(MatchJSON(`{"pages":[]}`))
+	})
+
+	It("PUTs pages", func() {
+		handler := server.NewHandler2(repo)
+		body := bytes.NewBufferString(`{"page":{"id":"|baz.md","markdownSource":"foobar"}}`)
+		req, err := http.NewRequest("PUT", "/v2/pages/|baz.md", body)
+		Expect(err).To(BeNil())
+		handler.ServeHTTP(resp, req)
+		Expect(resp.Code).To(Equal(http.StatusOK))
+		Expect(resp.Body.String()).To(MatchJSON(`{"page":{"id":"|baz.md","folder":"|","markdownSource":"foobar","modifiedAt": "0001-01-01T00:00:00Z"}}`))
 	})
 })
