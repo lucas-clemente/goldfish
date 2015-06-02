@@ -20,6 +20,7 @@ export default Ember.Controller.extend({
         id: id,
         folder: folder,
       });
+      file.save();
 
       this.transitionToRoute('page.edit', file);
 
@@ -37,6 +38,7 @@ export default Ember.Controller.extend({
           id: id,
           folder: folder,
         });
+        page.save();
         page.sendData(file);
       }
     },
