@@ -8,7 +8,7 @@ export default Ember.Controller.extend({
     },
 
     saveChanges: function () {
-      this.get('model').saveMarkdown();
+      this.get('model').save();
       this.transitionToRoute('page.show', this.get('model'));
     },
   },

@@ -147,15 +147,6 @@ export default DS.Model.extend({
     });
   },
 
-  saveMarkdown: function () {
-    var path = this.get('rawPath');
-    Ember.$.post(path, this.get('markdownSource'))
-    .fail(function () {
-      console.error('error saving to ', path);
-    });
-    this.set('modifiedAt', new Date());
-  },
-
   compiledMarkdown: Ember.computed('markdownSource', function () {
     var source = this.get('markdownSource');
     if (!source) {
