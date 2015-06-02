@@ -222,9 +222,9 @@ func errorHandler(h func(*gin.Context) error) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if err := h(c); err != nil {
 			if os.IsNotExist(err) {
-				c.Fail(404, err)
+				c.AbortWithError(404, err)
 			}
-			c.Fail(500, err)
+			c.AbortWithError(500, err)
 		}
 	}
 }
