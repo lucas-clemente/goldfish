@@ -32,7 +32,7 @@ export default Ember.Component.extend({
         return;
       }
       var files = e.dataTransfer.files;
-      this.sendAction('action', files);
+      this.sendAction('action', files, e.target);
     });
   },
 });

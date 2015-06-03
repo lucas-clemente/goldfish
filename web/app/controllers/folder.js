@@ -38,8 +38,10 @@ export default Ember.Controller.extend({
           id: id,
           folder: folder,
         });
-        page.save();
-        page.sendData(file);
+        /* jshint -W083 */
+        page.save().then(function () {
+          page.sendData(file);
+        });
       }
     },
   },

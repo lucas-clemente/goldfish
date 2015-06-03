@@ -25,5 +25,7 @@
 </div>
 
 {{#if page.isMarkdown}}
-  {{textarea-autosize value=page.markdownSource class="markdown-edit" placeholder='Type markdown here'}}
+  {{#drop-area action='uploadAndLinkFile'}}
+    {{textarea-autosize value=page.markdownSource class="markdown-edit" placeholder='Type markdown here'}}
+  {{/drop-area}}
 {{/if}}

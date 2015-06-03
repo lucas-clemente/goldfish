@@ -4,8 +4,8 @@
 
 Features:
 
-- File upload via drag and drop into the folder view
-- Commits that are less than a minute ago are automatically ammended
+- File upload via drag and drop into the folder view or drag and drop into the editor. The latter will insert a reference to the file into the text.
+- Commits that are less than a minute ago are automatically amended.
 - Autosave in the web editor
 
 Fixed:
