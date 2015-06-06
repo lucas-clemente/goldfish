@@ -87,10 +87,9 @@ var _ = Describe("Repo", func() {
 
 		It("notifies about changes", func() {
 			c := repo.Observer()
-			err := repo.StoreFile("/foo/Home.md", bytes.NewBufferString("foobar"))
+			err := repo.StoreFile("/Home.md", bytes.NewBufferString("foobar"))
 			Expect(err).To(BeNil())
-			Expect(<-c).To(Equal("/foo"))
-			Expect(<-c).To(Equal("/foo/Home.md"))
+			Expect(<-c).To(Equal("/Home.md"))
 			repo.CloseObserver(c)
 		})
 
