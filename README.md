@@ -6,7 +6,7 @@
 
 A personal wiki / notes blend powered by markdown and git.
 
-Inspired by Evernote and gollum.
+Inspired by [Evernote](https://evernote.com) and [gollum](https://github.com/gollum/gollum/).
 
 ## Features
 
@@ -15,17 +15,18 @@ Inspired by Evernote and gollum.
 - Files are markdown with some extensions:
   - LaTeX `$\latex$` or, if you want it on its own line, `\[ \latex \]`)
   - Easier links `[[foo]]`, also works for images `[[foo.png]]`
+- Search
+- Drag-n-drop upload (also into editor)
 
 Future features:
 
-- Search
 - Auto-push
 - Auto-Update of files and folders
 - Windows support
 
 ## Usage
 
-If you're on linux, make sure to install either `libinotifytools` or `inotifytools`.
+You should have git installed.
 
 ```bash
 # Or whatever path suits you
