@@ -51,14 +51,12 @@ func NewGitRepo(repoPath string) (*GitRepo, error) {
 	if _, err := os.Stat(repoPath + "/.git"); err != nil {
 		// Run git init <dir>
 		// Note that this creates the dir
-		if err := exec.Command("git", "init", repoPath).Run(); err != nil {
+		if _, err := runCommand(repoPath, "git", "init"); err != nil {
 			return nil, err
 		}
 
 		// Make an empty initial commit
-		cmd := exec.Command("git", "commit", "--allow-empty", "-m", "initial commit")
-		cmd.Dir = repoPath
-		if err := cmd.Run(); err != nil {
+		if _, err := runCommand(repoPath, "git", "commit", "--allow-empty", "-m", "initial commit"); err != nil {
 			return nil, err
 		}
 	}
@@ -222,18 +220,14 @@ func (r *GitRepo) CloseObserver(c <-chan string) {
 }
 
 func (r *GitRepo) addAllAndCommit(message string) error {
-	cmd := exec.Command("git", "add", "-A")
-	cmd.Dir = r.path
-	if err := cmd.Run(); err != nil {
+	if _, err := runCommand(r.path, "git", "add", "-A"); err != nil {
 		return fmt.Errorf("git add failed: %v", err)
 	}
 
 	// Check if there are changes
-	cmd = exec.Command("git", "status", "--porcelain")
-	cmd.Dir = r.path
-	statusOutput, err := cmd.Output()
+	statusOutput, err := runCommand(r.path, "git", "status", "--porcelain")
 	if err != nil {
-		return fmt.Errorf("git status failed: %v", err)
+		return err
 	}
 	if len(statusOutput) == 0 {
 		return nil
@@ -241,11 +235,9 @@ func (r *GitRepo) addAllAndCommit(message string) error {
 
 	// Ammend if the last commit is less than a minute ago
 	ammend := false
-	cmd = exec.Command("git", "show", "-s", "--format=%ci", "HEAD")
-	cmd.Dir = r.path
-	lastCommitDateString, err := cmd.Output()
+	lastCommitDateString, err := runCommand(r.path, "git", "show", "-s", "--format=%ci", "HEAD")
 	if err != nil {
-		return fmt.Errorf("git show failed: %v", err)
+		return err
 	}
 	lastCommitDate, err := time.Parse("2006-01-02 15:04:05 -0700\n", string(lastCommitDateString))
 	if err != nil {
@@ -259,10 +251,8 @@ func (r *GitRepo) addAllAndCommit(message string) error {
 	if ammend {
 		commandArgs = append(commandArgs, "--amend")
 	}
-	cmd = exec.Command("git", commandArgs...)
-	cmd.Dir = r.path
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("git commit failed: %v", err)
+	if _, err = runCommand(r.path, "git", commandArgs...); err != nil {
+		return err
 	}
 
 	return nil
@@ -270,4 +260,14 @@ func (r *GitRepo) addAllAndCommit(message string) error {
 
 func (r *GitRepo) absolutePath(path string) string {
 	return r.path + path
+}
+
+func runCommand(path string, command string, args ...string) (string, error) {
+	cmd := exec.Command(command, args...)
+	cmd.Dir = path
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return "", fmt.Errorf("%s %v failed: %v, output: %s", command, args, err, string(output))
+	}
+	return string(output), nil
 }

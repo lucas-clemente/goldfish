@@ -1,9 +1,10 @@
+sudo: false # Use containers
+
 language: go
 
 go:
   - 1.4
-  - tip
 
-install: go get -t ./...
+install: make ci-install
 
-script: go test -v ./...
+script: make test

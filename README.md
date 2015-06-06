@@ -1,5 +1,7 @@
 # Goldfish
 
+[![Build Status](https://travis-ci.org/lucas-clemente/goldfish.svg?branch=master)](https://travis-ci.org/lucas-clemente/goldfish)
+
 [Download](https://github.com/lucas-clemente/goldfish/releases)
 
 A personal wiki / notes blend powered by markdown and git.
