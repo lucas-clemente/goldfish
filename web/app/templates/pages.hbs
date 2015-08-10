@@ -12,7 +12,7 @@
 </div>
 
 <div class="list-group">
-  {{#each arrangedContent as |page|}}
+  {{#each model as |page|}}
     <div class="list-group-item search-result-page">
       <div class="pull-right modification-date">
         modified {{moment-calendar page.modifiedAt}}
