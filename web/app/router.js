@@ -6,8 +6,8 @@ var Router = Ember.Router.extend({
 });
 
 Router.map(function() {
-  this.resource('folder', {path: '/folders/:folder_id'}, function () {
-    this.resource('page', {path: '/pages/:page_id'}, function () {
+  this.route('folder', {resetNamespace: true, path: '/folders/:folder_id'}, function () {
+    this.route('page', {resetNamespace: true, path: '/pages/:page_id'}, function () {
       this.route('show', {path: ''});
       this.route('edit');
     });
