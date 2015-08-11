@@ -25,7 +25,7 @@
     "ember-cli-app-version": "^0.5.0",
     "ember-cli-babel": "^5.0.0",
     "ember-cli-dependency-checker": "^1.0.0",
-    "ember-cli-document-title": "^0.1.0",
+    "ember-cli-document-title": "lucas-clemente/ember-cli-document-title#actions",
     "ember-cli-focus-input": "^1.0.0",
     "ember-cli-htmlbars": "^0.7.6",
     "ember-cli-htmlbars-inline-precompile": "^0.2.0",
