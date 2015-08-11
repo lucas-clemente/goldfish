@@ -136,6 +136,11 @@ export default DS.Model.extend({
       return '<a href="' + href + '">' + text + '</a>';
     };
 
+    // Make tables nice
+    this.markdownRenderer.table = (header, body) => {
+      return `<table class="table table-hover"><thead>${header}<tbody>${body}</tbody></table>`;
+    };
+
     marked.setOptions({
       highlight: function (code, lang) {
         if (lang) {

@@ -1,5 +1,9 @@
 # Goldfish Changelog
 
+## 0.2.3 (unreleased)
+
+- Improve table formatting
+
 ## 0.2.2 (2015-06-04)
 
 Features:
