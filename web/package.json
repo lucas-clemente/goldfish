@@ -20,7 +20,7 @@
   "license": "MIT",
   "devDependencies": {
     "broccoli-asset-rev": "^2.0.2",
-    "ember-autosave": "lucas-clemente/ember-autosave#patch-1",
+    "ember-autosave": "^0.3.0",
     "ember-cli": "^1.13.8",
     "ember-cli-app-version": "^0.5.0",
     "ember-cli-babel": "^5.0.0",
@@ -37,10 +37,10 @@
     "ember-cli-sass": "^4.0.0",
     "ember-cli-sri": "^1.0.3",
     "ember-cli-uglify": "^1.0.1",
-    "ember-data": "^1.0.0-beta.19",
+    "ember-data": "^2.0.0-beta.2",
     "ember-disable-proxy-controllers": "^1.0.0",
     "ember-export-application-global": "^1.0.2",
-    "ember-moment": "3.5.0",
+    "ember-moment": "^3.5.0",
     "glob": "^5.0.6"
   }
 }
