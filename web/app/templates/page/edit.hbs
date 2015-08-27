@@ -1,9 +1,9 @@
 <div class="btn-group pull-right">
   <button class="btn btn-default" disabled={{saveDisallowed}} {{action "save"}}>
-    {{#if page.isSaving}}
+    {{#if model.isSaving}}
       <i class="fa fa-circle-o-notch fa-spin"></i>
       Saving &hellip;
-    {{else if page.isDirty}}
+    {{else if model.hasDirtyAttributes}}
       <i class="fa fa-save"></i>
       Save
     {{else}}
@@ -16,16 +16,16 @@
   </a>
 </div>
 
-<div class="page-header">
+<div class="model-header">
   <h1>
     Editing
-    {{page.title}}
-    <small>{{page.folderPath}}</small>
+    {{model.title}}
+    <small>{{model.folderPath}}</small>
   </h1>
 </div>
 
-{{#if page.isMarkdown}}
+{{#if model.isMarkdown}}
   {{#drop-area action='uploadAndLinkFile'}}
-    {{textarea-autosize value=page.markdownSource class="markdown-edit" placeholder='Type markdown here'}}
+    {{textarea-autosize value=model.markdownSource class="markdown-edit" placeholder='Type markdown here'}}
   {{/drop-area}}
 {{/if}}

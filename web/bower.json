@@ -1,12 +1,12 @@
 {
   "name": "goldfish",
   "dependencies": {
-    "ember": "2.1.0-beta.1",
+    "ember": "2.1.0-beta.2",
     "ember-cli-shims": "ember-cli/ember-cli-shims#0.0.4",
     "ember-cli-test-loader": "ember-cli-test-loader#0.2.0",
-    "ember-data": "2.0.0-beta.1",
+    "ember-data": "2.1.0-beta.1",
     "ember-load-initializers": "ember-cli/ember-load-initializers#0.1.6",
-    "ember-qunit": "^0.4.1",
+    "ember-qunit": "^0.4.10",
     "ember-qunit-notifications": "0.0.7",
     "ember-resolver": "~0.1.15",
     "jquery": "2.1.4",
@@ -22,6 +22,6 @@
     "moment-timezone": ">= 0.1.0"
   },
   "resolutions": {
-    "ember": "2.1.0-beta.1"
+    "ember": "2.1.0-beta.2"
   }
 }
